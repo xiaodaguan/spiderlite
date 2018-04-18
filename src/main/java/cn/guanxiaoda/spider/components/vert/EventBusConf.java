@@ -1,4 +1,4 @@
-package cn.guanxiaoda.spider.compnents;
+package cn.guanxiaoda.spider.components.vert;
 
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.models.TaskCodec;

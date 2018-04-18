@@ -1,6 +1,6 @@
-package cn.guanxiaoda.spider.flow.impl.demo;
+package cn.guanxiaoda.spider.components.vert.impl.demo;
 
-import cn.guanxiaoda.spider.flow.IFetcher;
+import cn.guanxiaoda.spider.components.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
  * @date 2018/4/17
  */
 @Component
-public class DemoFetcher implements IFetcher<Task> {
+public class DemoFetcher implements IProcessor<Task> {
     @Override
-    public Task fetch(Task task) {
+    public Task process(Task task) {
         return task.setFetched(task.getUrl() + "(fetched)");
     }
+
 }

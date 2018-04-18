@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.controllers;
 
-import cn.guanxiaoda.spider.flow.impl.demo.DemoSpider;
+import cn.guanxiaoda.spider.components.vert.impl.demo.DemoSpider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

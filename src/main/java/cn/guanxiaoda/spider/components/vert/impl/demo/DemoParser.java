@@ -1,6 +1,6 @@
-package cn.guanxiaoda.spider.flow.impl.demo;
+package cn.guanxiaoda.spider.components.vert.impl.demo;
 
-import cn.guanxiaoda.spider.flow.IParser;
+import cn.guanxiaoda.spider.components.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
  * @date 2018/4/17
  */
 @Component
-public class DemoParser implements IParser<Task> {
+public class DemoParser implements IProcessor<Task> {
     @Override
-    public Task parse(Task task) {
+    public Task process(Task task) {
         return task.setParsed(task.getFetched() + "(parsed)");
     }
 }
