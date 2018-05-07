@@ -2,6 +2,6 @@
 .vertx
 target
 spiderlite.iml
-**/application.yml
-**/application.properties
-src/main/resources/application.properties
+**/resources/application.yml
+**/resources/application.properties
+**/logs/
