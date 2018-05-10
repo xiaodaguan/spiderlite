@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.impl.wx;
 
-import cn.guanxiaoda.spider.components.IProcessor;
+import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ public class Pager implements IProcessor<Task> {
                     if (CollectionUtils.isEmpty(list)) {
                         task.getCtx().put("stopSend", true);
                         log.info("no following pages, task={}", JSON.toJSONString(task));
+                        task.setStage("stopped");
                         return;
                     }
                     task.getCtx().put("pageNo", Optional.of(task.getCtx())
@@ -34,9 +35,11 @@ public class Pager implements IProcessor<Task> {
                             .map(pageNo -> pageNo + 1)
                             .get()
                     );
+                    task.getCtx().remove("fetched");
+                    task.getCtx().remove("parsed");
                     log.info("will crawl following pages, task={}", JSON.toJSONString(task));
-
+                    task.setStage("paged");
                 });
-        return null;
+        return task;
     }
 }

@@ -1,9 +1,10 @@
 package cn.guanxiaoda.spider.components.vert.impl.wx;
 
-import cn.guanxiaoda.spider.components.IProcessor;
+import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.utils.RetryUtils;
+import com.alibaba.fastjson.JSON;
 import com.google.common.util.concurrent.RateLimiter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -21,11 +22,11 @@ import java.util.Optional;
 @Slf4j
 public class Fetcher implements IProcessor<Task> {
 
-    static RateLimiter rl = RateLimiter.create(0.5);
+    private static RateLimiter rl = RateLimiter.create(0.1);
 
     @Override
     public Task process(Task task) {
-
+        log.error(JSON.toJSONString(task));
         int pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).orElse(1);
         String url = Optional.of(task.getCtx()).map(ctx -> ctx.get("url")).map(String::valueOf)
                 .map(tmp -> tmp.replace("{begin}", String.valueOf((pageNo - 1) * 10)))

@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.controllers;
 
-import cn.guanxiaoda.spider.components.vert.impl.wx.App;
+import cn.guanxiaoda.spider.components.vert.impl.wx.WxSpider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/spider")
 public class SpiderController {
 
-    @Autowired @Qualifier("wxSpider") App spider;
+    @Autowired @Qualifier("wxSpider") WxSpider spider;
 
     @RequestMapping("/wx/start")
     public void start() {

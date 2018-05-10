@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.impl.wx;
 
-import cn.guanxiaoda.spider.components.IProcessor;
+import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -23,7 +23,8 @@ public class Printer implements IProcessor<Task> {
         List parsed = Optional.ofNullable(task.getCtx()).map(ctx -> ctx.get("parsed"))
                 .map(obj -> (List<Map<String, Object>>) obj)
                 .orElse(Lists.newArrayList());
-        log.info(JSON.toJSONString(parsed));
+        log.info("item crawled: {}", JSON.toJSONString(parsed));
+        task.setStage("printed");
         return task;
     }
 }

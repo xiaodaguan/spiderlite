@@ -1,4 +1,4 @@
-package cn.guanxiaoda.spider.components;
+package cn.guanxiaoda.spider.components.vert;
 
 /**
  * @author guanxiaoda

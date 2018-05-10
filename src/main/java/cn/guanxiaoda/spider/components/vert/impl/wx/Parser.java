@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.impl.wx;
 
-import cn.guanxiaoda.spider.components.IProcessor;
+import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import im.nll.data.extractor.Extractors;
 import org.apache.commons.collections4.CollectionUtils;
