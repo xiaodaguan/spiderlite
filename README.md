@@ -1,6 +1,18 @@
 # spiderlite
 轻量级爬虫，基于springboot+vertx
 
+
+## 已完成的spider
+
+- 微信公众号文章
+  - 这个是带登录状态的抓取，抓了一会被封了--!
+
+
+## todo
+ 
+- 微信定时自动获取登录状态 
+
+## 食用方式
 ``` java
 @Component(value = "wxSpider")
 public class WxSpider extends BaseSpider {
@@ -26,3 +38,5 @@ public class WxSpider extends BaseSpider {
 }
 
 ```
+
+

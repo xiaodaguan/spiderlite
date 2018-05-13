@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.impl.wx;
 
+import cn.guanxiaoda.spider.components.vert.IFlipper;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
@@ -17,16 +18,25 @@ import java.util.Optional;
  */
 @Component("wxPager")
 @Slf4j
-public class Pager implements IProcessor<Task> {
+public class Pager implements IFlipper<Task> {
     @Override
-    public Task process(Task task) {
-        Optional.of(task.getCtx().get("parsed"))
+    public void process(Task task) {
+        Optional.ofNullable(task.getCtx().get("parsed"))
                 .map(obj -> (List<Map<String, Object>>) obj)
                 .ifPresent(list -> {
                     if (CollectionUtils.isEmpty(list)) {
-                        task.getCtx().put("stopSend", true);
+                        task.getCtx().put("stopFlip", true);
                         log.info("no following pages, task={}", JSON.toJSONString(task));
                         task.setStage("stopped");
+                        return;
+                    }
+
+                    Integer maxPage = Optional.ofNullable(task.getCtx().get("maxPage")).map(Integer.class::cast).orElse(Integer.MAX_VALUE);
+                    Integer curPage = Optional.ofNullable(task.getCtx().get("pageNo")).map(Integer.class::cast).orElse(1);
+                    if (curPage >= maxPage) {
+                        task.getCtx().put("stopFlip", true);
+                        task.setStage("stopped");
+                        log.info("reach max pages, will stop, task={}", JSON.toJSONString(task));
                         return;
                     }
                     task.getCtx().put("pageNo", Optional.of(task.getCtx())
@@ -40,6 +50,5 @@ public class Pager implements IProcessor<Task> {
                     log.info("will crawl following pages, task={}", JSON.toJSONString(task));
                     task.setStage("paged");
                 });
-        return task;
     }
 }

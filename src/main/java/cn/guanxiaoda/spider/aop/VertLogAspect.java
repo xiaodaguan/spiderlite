@@ -22,7 +22,7 @@ import java.util.Optional;
 @Slf4j
 public class VertLogAspect {
 
-    @Pointcut("execution(public cn.guanxiaoda.spider.models.Task cn.guanxiaoda.spider.components..*.process(..))")
+    @Pointcut("execution(public * cn.guanxiaoda.spider.components..*.process(..))")
     public void log() {
 
     }
@@ -32,7 +32,6 @@ public class VertLogAspect {
 //        Object[] args = joinPoint.getArgs();
 //        for (Object arg : args) {
 //            if (arg instanceof Task) {
-//
 //                log.info("before {} process: stage={}, task={}",
 //                        joinPoint.getTarget().getClass().getSimpleName(),
 //                        Optional.of(arg)
@@ -45,18 +44,17 @@ public class VertLogAspect {
 
     @After("log()")
     public void logAfter(JoinPoint joinPoint) {
-//        Object[] args = joinPoint.getArgs();
-//        for (Object arg : args) {
-//            if (arg instanceof Task) {
-//
-//                log.info("after {} process: stage={}, task={}",
-//                        joinPoint.getTarget().getClass().getSimpleName(),
-//                        Optional.of(arg)
-//                                .map(Task.class::cast)
-//                                .map(Task::getStage).orElse("none")
-//                        , JSON.toJSONString(arg));
-//            }
-//        }
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof Task) {
+                log.info("after {} process: stage={}, task={}",
+                        joinPoint.getTarget().getClass().getSimpleName(),
+                        Optional.of(arg)
+                                .map(Task.class::cast)
+                                .map(Task::getStage).orElse("none")
+                        , JSON.toJSONString(arg));
+            }
+        }
     }
 
     @AfterThrowing(pointcut = "log()", throwing = "e")

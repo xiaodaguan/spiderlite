@@ -17,7 +17,7 @@ public class EventBusConf {
     private static VertxOptions opt = new VertxOptions();
 
     static {
-        opt.setMaxEventLoopExecuteTime(15L * 1000 * 1000 * 1000);
+        opt.setMaxEventLoopExecuteTime((7 * 24 * 3600L) * 1000 * 1000 * 1000);
 
     }
 
@@ -26,7 +26,6 @@ public class EventBusConf {
         Vertx vertx = Vertx.vertx(opt);
         EventBus eb = vertx.eventBus();
         eb.registerDefaultCodec(Task.class, new TaskCodec());
-
         return eb;
     }
 }

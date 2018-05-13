@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author guanxiaoda
@@ -17,6 +18,8 @@ import java.util.Optional;
  */
 @Slf4j
 public abstract class BaseSpider {
+
+
     @Autowired
     private EventBus eb;
     private String starterAddr;
@@ -27,22 +30,27 @@ public abstract class BaseSpider {
      */
     protected void addProcessor(IProcessor handler, IProcessor... next) {
         this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> {
-            boolean stopFlag = Optional.ofNullable(msg.body())
+            Task task = msg.body();
+            boolean stopFlag = Optional.ofNullable(task)
                     .map(Task::getCtx)
-                    .map(ctx -> ctx.get("stopSend"))
+                    .map(ctx -> ctx.get("stopFlip"))
                     .map(Boolean.class::cast)
                     .orElse(false);
-            if (stopFlag) {
-                log.info("stop event sending, task={}", JSON.toJSONString(msg.body()));
-                return;
-            }
+            handler.process(task);
             if (next.length > 0) {
-                Task task = (Task) handler.process(msg.body());
-                Arrays.asList(next).forEach(pro -> {
+                Arrays.stream(next).forEach(pro -> {
+                    if (stopFlag && pro instanceof IFlipper) {
+                        log.info("stop flip over {}->{}, task={}",
+                                handler.getClass().getSimpleName(),
+                                Arrays.stream(next).map(pro1 -> pro1.getClass().getSimpleName()).collect(Collectors.joining(",", "[", "]")),
+                                JSON.toJSONString(msg.body()));
+                        return;
+                    }
                     eb.send(pro.getClass().getName(), task);
                 });
             }
         });
+
     }
 
     /**
@@ -52,15 +60,15 @@ public abstract class BaseSpider {
         this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> handler.process(msg.body()));
     }
 
-    protected void send(Task task) {
+    protected void launch(Task task) {
         try {
             this.eb.send(starterAddr, task);
         } catch (NullPointerException e) {
-            log.error("send action must after starter registered!");
+            log.error("launch action must after starter registered!");
         }
     }
 
-    protected void setStarter(IProcessor<Task> processor) {
+    protected void setStarter(IProcessor processor) {
         this.starterAddr = processor.getClass().getName();
     }
 }

@@ -1,0 +1,32 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+### 公众号列表
+GET https://mp.weixin.qq.com/cgi-bin/searchbiz?action=search_biz&token=660035242&f=json&ajax=1&query=程序员小灰&begin=0&count=5
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Cookie: noticeLoginFlag=1; ua_id=sTPaxE9j3XNEt5jlAAAAAKYAXptzCThn85jJJQN43Uk=; pgv_pvi=4797978624; pgv_si=s9122960384; ticket_id=gh_eecd327a369c; cert=dftBLBNGRhVasKzCSFF1olmqMij1ObXC; rewardsn=; wxtokenkey=777; mm_lang=zh_CN; uuid=ecb9751de7cbb0ac259924749177b7ec; ticket=4256e9b9a843d2c0126341a33b6f421d9441a935; noticeLoginFlag=1; remember_acct=xiaodaguan%40gmail.com; data_bizuin=3595588900; bizuin=3550833854; data_ticket=U89cMBovtN/W1Bm/0m68mEpcJcrnpMPQ4lRNQ4LHPqVlO0SSE8gYXPHvnK14jXAF; slave_sid=YlE3RmNrWWtrSVlieGlaUmE1eVV5QUR6ZWJUQ3dzZXlweFFVdWlFeVpwWFJUcjZDdFBhWXVWYW5LY0xmMURjSGhISjlJb2dHZkxiU2NMU1BKOUNhNnhWQVBTWFJhZHdfSVFvMGg2VUQ0d3NnczNTOUxNUzU0aTVJMm1yVVlJSjloSE84UWRUbEhwV1RxSHFl; slave_user=gh_eecd327a369c; xid=20c5b783bb13c38f65d2d0dbd8fee831; openid2ticket_oJFVQ1kBxXq5xBn4vhhUaIedXTao=0sf2EhALnQHDWpuWU6wC64qTzh1Zfb+FGyRCJvr7caU=
+Host: mp.weixin.qq.com
+Referer: https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_edit_v2&action=edit&isNew=1&type=10&token=861722949&lang=en_US
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3409.0 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+
+### 文章列表
+GET https://mp.weixin.qq.com/cgi-bin/appmsg?token=705391348&lang=zh_CN&f=json&ajax=1&random=0.168974812645587&action=list_ex&begin=0&count=5&query=&fakeid=MzA3MDQ3ODQ2OQ%3D%3D&type=9
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Cookie: noticeLoginFlag=1; ua_id=sTPaxE9j3XNEt5jlAAAAAKYAXptzCThn85jJJQN43Uk=; pgv_pvi=4797978624; mm_lang=zh_CN; noticeLoginFlag=1; remember_acct=xiaodaguan%40gmail.com; pgv_si=s691451904; uuid=4a8ddf4783ef6ff57aca9be896c0738b; ticket=a48b59cc0d21439b571d278ac790ccea37ad7ccf; ticket_id=gh_eecd327a369c; cert=usdJNGJ8kJGSnUNjmgcTNCIKT6G0n5Dg; data_bizuin=3595588900; bizuin=3550833854; data_ticket=3Y6paC7arOiFH2Q9KCzftcIcIv+NB+XmdtsQY53wsD90eo+5Ht9bmEQH2n40uN7B; slave_sid=RFpraXA4RUJRYndkRXhhRV9MOEdGSDVCSDZlM2pHMEFqWlNpYlkwYzhITDgyODJyWGZ2NzJHZ091a1NUZFp4WGtQdzZRVUZURktiRllTamd3MUtjeFA4R3dldjAxSUFWRDV4dlhNcEdGdnVGOHFmYkwzbVVGYU9IcXBBUnBDcjBQNEt2VUxHcG95a01GNFdZ; slave_user=gh_eecd327a369c; xid=f464753252d60696cda3b566928a6dbc; openid2ticket_oJFVQ1kBxXq5xBn4vhhUaIedXTao=32KT7nM+SpwX/lKvThrFFB5u8R+I5w31N/G6G0eLpJM=
+Host: mp.weixin.qq.com
+Referer: https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_edit_v2&action=edit&isNew=1&type=10&token=705391348&lang=zh_CN
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3426.2 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+###

@@ -5,5 +5,5 @@ package cn.guanxiaoda.spider.components.vert;
  * @date 2018/4/18
  */
 public interface IProcessor<T> {
-    T process(T t);
+    void process(T t);
 }
