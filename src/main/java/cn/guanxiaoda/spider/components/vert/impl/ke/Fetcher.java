@@ -3,6 +3,7 @@ package cn.guanxiaoda.spider.components.vert.impl.ke;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
+import cn.guanxiaoda.spider.proxy.IProxyManager;
 import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -11,6 +12,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -37,7 +40,7 @@ public class Fetcher implements IProcessor<Task> {
                     .put("X-Requested-With", "XMLHttpRequest")
                     .build()
     );
-
+    @Autowired @Qualifier("gobanjiaProxyManager") private IProxyManager proxyManager;
 
     @Override
     public void process(Task task) {
@@ -50,6 +53,7 @@ public class Fetcher implements IProcessor<Task> {
 
         Unirest.setHttpClient(ClientPool.getDefaultClient());
         rl.acquire();
+        Optional.ofNullable(proxyManager.randomGetOne()).ifPresent(Unirest::setProxy);
         HttpResponse<String> response = RetryUtils.retry(() -> Unirest.get(url)
                 .headers(headers)
                 .asString()

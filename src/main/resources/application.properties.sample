@@ -4,3 +4,4 @@ custom.mongodb.db=spider_db
 custom.mongodb.user=spider
 custom.mongodb.pass=123456
 
+proxy.vendor.url=http://dynamic.goubanjia.com/dynamic/get/{yourCode}.html?sep=3
