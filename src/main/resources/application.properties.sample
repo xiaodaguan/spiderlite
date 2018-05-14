@@ -1,0 +1,6 @@
+custom.mongodb.host=localhost
+custom.mongodb.port=27017
+custom.mongodb.db=spider_db
+custom.mongodb.user=spider
+custom.mongodb.pass=123456
+
