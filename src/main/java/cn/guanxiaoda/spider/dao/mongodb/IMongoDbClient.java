@@ -21,7 +21,7 @@ public interface IMongoDbClient {
     /**
      * read
      */
-    Document findDocByItem(String collection, Map<String, Object> item);
+    Document findDocById(String collection, Map<String, Object> item);
     List<Document> findAllDocs(String collection);
 
     /**

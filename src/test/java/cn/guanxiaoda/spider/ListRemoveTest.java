@@ -1,9 +1,13 @@
 package cn.guanxiaoda.spider;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author guanxiaoda
@@ -11,6 +15,18 @@ import java.util.List;
  */
 public class ListRemoveTest {
 
+
+    @Test
+    public void linkedListRm() {
+        List list = Lists.newArrayList();
+        list.addAll(IntStream.range(0, 10).boxed().collect(Collectors.toList()));
+        System.out.println(list);
+        list.addAll(Arrays.asList(11, 12, 13, 15, 14));
+        if (list.size() > 10) {
+            list = (List) list.stream().skip(list.size() - 10).collect(Collectors.toList());
+        }
+        System.out.println(list);
+    }
 
     @Test
     public void testRemove1() {

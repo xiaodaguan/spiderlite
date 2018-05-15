@@ -11,8 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Component(value = "gobanjiaProxyManager")
 @Slf4j
+@EnableScheduling
 @ConfigurationProperties
 public class GobanjiaProxyManager implements IProxyManager {
 
@@ -38,11 +40,15 @@ public class GobanjiaProxyManager implements IProxyManager {
 
     @Override
     public HttpHost randomGetOne() {
+        if (proxyContainer.size() == 0) {
+            return null;
+        }
         return proxyContainer.get(new Random().nextInt(proxyContainer.size()));
     }
 
     @Override
     @Synchronized
+    @Scheduled(fixedRate = 1000)
     public void refresh() {
         if (proxyContainer == null) {
             proxyContainer = Lists.newArrayList();
@@ -50,7 +56,7 @@ public class GobanjiaProxyManager implements IProxyManager {
 
         Unirest.setHttpClient(ClientPool.getDefaultClient());
 
-        proxyContainer = Optional.ofNullable(RetryUtils.retry(() -> Unirest.get(url).asString()))
+        proxyContainer.addAll(Optional.ofNullable(RetryUtils.retry(() -> Unirest.get(url).asString()))
                 .map(HttpResponse::getBody)
                 .map(body -> StringUtils.split(body, "\n"))
                 .map(Arrays::asList)
@@ -59,8 +65,10 @@ public class GobanjiaProxyManager implements IProxyManager {
                 .map(str -> StringUtils.split(str, "\t"))
                 .filter(array -> array.length == 2)
                 .map(array -> new HttpHost(array[0], Integer.parseInt(array[1])))
-                .collect(Collectors.toList());
-        log.info("refresh {} proxies", proxyContainer.size());
+                .collect(Collectors.toList()));
+        if (proxyContainer.size() > 5) {
+            proxyContainer = proxyContainer.stream().skip(proxyContainer.size() - 5).collect(Collectors.toList());
+        }
     }
 
     @PostConstruct

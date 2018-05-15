@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert;
 
+import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import io.vertx.core.Handler;
@@ -7,6 +8,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public abstract class BaseSpider {
 
 
+    @Autowired @Qualifier("mongoClient") protected IMongoDbClient mongoClient;
     @Autowired
     private EventBus eb;
     private String starterAddr;

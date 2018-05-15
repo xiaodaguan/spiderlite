@@ -1,6 +1,7 @@
 package cn.guanxiaoda.spider.aop;
 
 import cn.guanxiaoda.spider.models.Task;
+import cn.guanxiaoda.spider.monitor.TaskMonitor;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -9,9 +10,9 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * @author guanxiaoda
@@ -22,10 +23,10 @@ import java.util.Optional;
 @Slf4j
 public class VertLogAspect {
 
-    @Pointcut("execution(public * cn.guanxiaoda.spider.components..*.process(..))")
-    public void log() {
+    @Autowired @Qualifier("taskMonitor") TaskMonitor monitor;
 
-    }
+    @Pointcut("execution(public * cn.guanxiaoda.spider.components..*.process(..))")
+    public void log() { }
 
     @Before("log()")
     public void logBefore(JoinPoint joinPoint) {
@@ -49,12 +50,15 @@ public class VertLogAspect {
             if (arg instanceof Task) {
                 log.info("after {} process: stage={}, task={}",
                         joinPoint.getTarget().getClass().getSimpleName(),
-                        Optional.of(arg)
-                                .map(Task.class::cast)
-                                .map(Task::getStage).orElse("none")
+                        ((Task) arg).getStage()
                         , JSON.toJSONString(arg));
+                reportTaskInfo((Task) arg);
             }
         }
+    }
+
+    private void reportTaskInfo(Task task) {
+        monitor.tell(task);
     }
 
     @AfterThrowing(pointcut = "log()", throwing = "e")
