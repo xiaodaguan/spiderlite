@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.proxy.IProxyManager;
@@ -8,15 +8,15 @@ import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.RateLimiter;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
+import okhttp3.Headers;
+import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.net.URLEncoder;
+import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,10 +26,12 @@ import java.util.Optional;
  */
 @Component(value = "lagouDetailFetcher")
 @Slf4j
-public class DetailFetcher implements IProcessor<Task> {
+public class DetailFetcher extends BaseProcessor {
 
     private static final String URL_TEMPLATE = "https://m.lagou.com/jobs/{positionId}.html";
-    private static RateLimiter rl = RateLimiter.create(0.1);
+
+    private static Double limit;
+    private static RateLimiter rl;
     private static Map<String, String> headers = Maps.newHashMap(
             ImmutableMap.<String, String>builder()
 
@@ -44,27 +46,43 @@ public class DetailFetcher implements IProcessor<Task> {
 
                     .build()
     );
+    @Autowired ClientPool clientPool;
     @Autowired @Qualifier("gobanjiaProxyManager") private IProxyManager proxyManager;
 
+    @Value("${ratelimit.fetcher.lagou}")
+    public void setLimit(Double qps) {
+        limit = qps;
+    }
+
+    @PostConstruct
+    public void init() {
+        rl = RateLimiter.create(limit);
+    }
+
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         String positionId = Optional.of(task.getCtx()).map(ctx -> ctx.get("positionId")).map(String::valueOf).orElse("");
 
         String url = URL_TEMPLATE.replace("{positionId}", positionId);
 
-        Unirest.setHttpClient(ClientPool.getDefaultClient());
         rl.acquire();
-        Optional.ofNullable(proxyManager.randomGetOne()).ifPresent(Unirest::setProxy);
-        HttpResponse<String> response = RetryUtils.retry(() -> Unirest.get(url).headers(headers).asString());
+
+        String response = RetryUtils.retry(() ->
+                clientPool.getOkClient()
+                        .newCall(new Request.Builder()
+                                .headers(Headers.of(headers))
+                                .url(url)
+                                .build())
+                        .execute()
+                        .body()
+                        .string());
 
         Optional.ofNullable(response)
                 .ifPresent(resp -> {
-                    if (resp.getStatus() != HttpStatus.SC_OK) {
-                        return;
-                    }
-                    task.getCtx().put("fetched", response.getBody());
+                    task.getCtx().put("fetched", resp);
                     task.setStage("fetched");
                 });
+
 
     }
 

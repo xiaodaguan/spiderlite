@@ -11,7 +11,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,24 +22,22 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class VertLogAspect {
 
-    @Autowired @Qualifier("taskMonitor") TaskMonitor monitor;
+    @Autowired TaskMonitor monitor;
 
     @Pointcut("execution(public * cn.guanxiaoda.spider.components..*.process(..))")
     public void log() { }
 
     @Before("log()")
     public void logBefore(JoinPoint joinPoint) {
-//        Object[] args = joinPoint.getArgs();
-//        for (Object arg : args) {
-//            if (arg instanceof Task) {
-//                log.info("before {} process: stage={}, task={}",
-//                        joinPoint.getTarget().getClass().getSimpleName(),
-//                        Optional.of(arg)
-//                                .map(Task.class::cast)
-//                                .map(Task::getStage).orElse("none")
-//                        , JSON.toJSONString(arg));
-//            }
-//        }
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof Task) {
+                log.info("before {} process: stage={}, task={}",
+                        joinPoint.getTarget().getClass().getSimpleName(),
+                        ((Task) arg).getStage()
+                        , JSON.toJSONString(arg));
+            }
+        }
     }
 
     @After("log()")
@@ -52,14 +49,11 @@ public class VertLogAspect {
                         joinPoint.getTarget().getClass().getSimpleName(),
                         ((Task) arg).getStage()
                         , JSON.toJSONString(arg));
-                reportTaskInfo((Task) arg);
+                monitor.tell((Task) arg);
             }
         }
     }
 
-    private void reportTaskInfo(Task task) {
-        monitor.tell(task);
-    }
 
     @AfterThrowing(pointcut = "log()", throwing = "e")
     public void afterThrowing(Throwable e) {

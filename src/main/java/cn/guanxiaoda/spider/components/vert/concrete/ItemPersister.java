@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +18,12 @@ import java.util.Optional;
  */
 @Component(value = "itemPersister")
 @Slf4j
-public class ItemPersister implements IProcessor<Task> {
+public class ItemPersister extends BaseProcessor {
 
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Object parsed = Optional.ofNullable(task.getCtx()).map(ctx -> ctx.get("parsed")).orElse(null);
 
         String collection = Optional.ofNullable(task.getCtx())
@@ -33,12 +33,13 @@ public class ItemPersister implements IProcessor<Task> {
 
         if (parsed instanceof List) {
             mongoDbClient.save(collection, (List) parsed);
+            task.setStage("persisted");
         } else if (parsed instanceof Map) {
             mongoDbClient.save(collection, (Map) parsed);
+            task.setStage("persisted");
         } else {
             log.error("illegal parse result type, parsed={}", parsed);
         }
 
-        task.setStage("persisted");
     }
 }

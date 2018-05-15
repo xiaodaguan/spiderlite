@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import im.nll.data.extractor.Extractors;
 import org.springframework.stereotype.Component;
@@ -17,12 +17,12 @@ import static im.nll.data.extractor.Extractors.json;
  * @date 2018/4/17
  */
 @Component(value = "lagouListParser")
-public class Parser implements IProcessor<Task> {
+public class Parser extends BaseProcessor {
 
     private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))
                 .map(String::valueOf)
@@ -40,7 +40,7 @@ public class Parser implements IProcessor<Task> {
                                 .asMapList()
                                 .stream()
                                 .peek(item -> item.put("crawlTime", LocalDateTime.now().format(dtf)))
-                                .peek(item -> item.put("uniqueKey", item.get("poisitionId")))
+                                .peek(item -> item.put("uniqueKey", item.get("positionId")))
                                 .collect(Collectors.toList())
                 )
                 .ifPresent(itemList -> {

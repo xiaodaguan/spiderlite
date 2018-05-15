@@ -34,7 +34,7 @@ public class LagouListSpider extends BaseSpider {
         setTerminate(persister);
 
         mongoClient.findAllDocs("lagou_count")
-                .stream()
+                .parallelStream()
                 .map(doc -> Maps.immutableEntry(
                         doc.getString("name"),
                         (int) Math.ceil((1.0 * doc.getInteger("count")) / 30)

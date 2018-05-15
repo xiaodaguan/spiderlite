@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
  * @date 2018/5/10
  */
 @Component("lagouListStarter")
-public class Starter implements IProcessor<Task> {
+public class Starter extends BaseProcessor {
+
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         task.setStage("init");
     }
 }

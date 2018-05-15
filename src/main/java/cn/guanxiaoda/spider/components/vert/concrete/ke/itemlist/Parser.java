@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,11 +22,11 @@ import static im.nll.data.extractor.Extractors.selector;
  * @date 2018/4/17
  */
 @Component(value = "keParser")
-public class Parser implements IProcessor<Task> {
+public class Parser extends BaseProcessor {
 
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))
                 .map(String::valueOf)

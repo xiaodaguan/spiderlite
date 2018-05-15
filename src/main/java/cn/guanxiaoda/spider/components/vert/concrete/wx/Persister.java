@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.Lists;
@@ -19,12 +19,12 @@ import java.util.Optional;
  */
 @Component(value = "wxPersister")
 @Slf4j
-public class Persister implements IProcessor<Task> {
+public class Persister extends BaseProcessor {
 
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         List parsed = Optional.ofNullable(task.getCtx()).map(ctx -> ctx.get("parsed"))
                 .map(obj -> (List<Map<String, Object>>) obj)
                 .orElse(Lists.newArrayList());

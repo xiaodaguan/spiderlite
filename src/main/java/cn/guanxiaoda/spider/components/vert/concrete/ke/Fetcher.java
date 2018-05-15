@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.proxy.IProxyManager;
@@ -25,7 +25,7 @@ import java.util.Optional;
  */
 @Component(value = "keFetcher")
 @Slf4j
-public class Fetcher implements IProcessor<Task> {
+public class Fetcher extends BaseProcessor {
 
     private static RateLimiter rl = RateLimiter.create(0.05);
     private static Map<String, String> headers = Maps.newHashMap(
@@ -40,10 +40,11 @@ public class Fetcher implements IProcessor<Task> {
                     .put("X-Requested-With", "XMLHttpRequest")
                     .build()
     );
+    @Autowired ClientPool clientPool;
     @Autowired @Qualifier("gobanjiaProxyManager") private IProxyManager proxyManager;
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         String cityId = Optional.of(task.getCtx()).map(ctx -> ctx.get("cityId")).map(String::valueOf).orElse("");
         int pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).orElse(1);
         String url = Optional.of(task.getCtx()).map(ctx -> ctx.get("url")).map(String::valueOf)
@@ -51,9 +52,9 @@ public class Fetcher implements IProcessor<Task> {
                 .map(tmp -> tmp.replace("{cityId}", cityId))
                 .orElse("");
 
-        Unirest.setHttpClient(ClientPool.getDefaultClient());
+        Unirest.setHttpClient(clientPool.getApacheClient());
         rl.acquire();
-        Optional.ofNullable(proxyManager.randomGetOne()).ifPresent(Unirest::setProxy);
+        Optional.ofNullable(proxyManager.randomGetOneHttpHost()).ifPresent(Unirest::setProxy);
         HttpResponse<String> response = RetryUtils.retry(() -> Unirest.get(url)
                 .headers(headers)
                 .asString()

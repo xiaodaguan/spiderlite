@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import im.nll.data.extractor.Extractors;
 import org.springframework.stereotype.Component;
@@ -17,12 +17,12 @@ import static im.nll.data.extractor.Extractors.selector;
  * @date 2018/4/17
  */
 @Component(value = "lagouDetailParser")
-public class Parser implements IProcessor<Task> {
+public class Parser extends BaseProcessor {
 
     private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
 
         Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))

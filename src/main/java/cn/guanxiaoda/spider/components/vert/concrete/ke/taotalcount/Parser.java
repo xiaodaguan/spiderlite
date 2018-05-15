@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.taotalcount;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import im.nll.data.extractor.Extractors;
@@ -15,11 +15,11 @@ import static im.nll.data.extractor.Extractors.json;
  * @date 2018/4/17
  */
 @Component(value = "keCountParser")
-public class Parser implements IProcessor<Task> {
+public class Parser extends BaseProcessor {
 
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))
                 .map(String::valueOf)

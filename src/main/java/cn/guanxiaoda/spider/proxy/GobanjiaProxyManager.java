@@ -1,14 +1,16 @@
 package cn.guanxiaoda.spider.proxy;
 
-import cn.guanxiaoda.spider.http.ClientPool;
-import cn.guanxiaoda.spider.utils.RetryUtils;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,6 +18,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,17 +38,35 @@ import java.util.stream.Collectors;
 public class GobanjiaProxyManager implements IProxyManager {
 
 
-    private static List<HttpHost> proxyContainer;
-
+    private static List<String> proxyContainer;
+    private static CloseableHttpClient client = HttpClientBuilder.create().build();
     @Value("${proxy.vendor.url}")
     public String url;
 
     @Override
-    public HttpHost randomGetOne() {
+    public HttpHost randomGetOneHttpHost() {
         if (proxyContainer.size() == 0) {
             return null;
         }
-        return proxyContainer.get(new Random().nextInt(proxyContainer.size()));
+        String proxy = proxyContainer.get(new Random().nextInt(proxyContainer.size()));
+        log.info("[random proxy]: {}", proxy);
+        return Optional.of(proxy)
+                .map(str -> str.split(":"))
+                .map(arr -> new HttpHost(arr[0], Integer.parseInt(arr[1])))
+                .orElse(null);
+    }
+
+    @Override
+    public SocketAddress randomGetOneAddress() {
+        if (proxyContainer.size() == 0) {
+            return null;
+        }
+        String proxy = proxyContainer.get(new Random().nextInt(proxyContainer.size()));
+        log.info("[random proxy]: {}", JSON.toJSONString(proxy));
+        return Optional.of(proxy)
+                .map(str -> str.split(":"))
+                .map(arr -> new InetSocketAddress(arr[0], Integer.parseInt(arr[1])))
+                .orElse(null);
     }
 
     @Override
@@ -54,18 +77,40 @@ public class GobanjiaProxyManager implements IProxyManager {
             proxyContainer = Lists.newArrayList();
         }
 
-        Unirest.setHttpClient(ClientPool.getDefaultClient());
+        HttpGet get = new HttpGet(url);
+        CloseableHttpResponse response = null;
+        try {
+            response = client.execute(get);
+            if (200 != response.getStatusLine().getStatusCode()) {
+                log.warn("didn't get proxy");
+                return;
+            }
+            proxyContainer.addAll(Optional.of(response)
+                    .map(resp -> {
+                        try {
+                            return EntityUtils.toString(resp.getEntity());
+                        } catch (IOException e) {
+                            log.error("consume entity failure", e);
+                            return null;
+                        }
+                    })
+                    .map(body -> StringUtils.split(body, "\n"))
+                    .map(Arrays::asList)
+                    .orElse(Lists.newArrayList()));
 
-        proxyContainer.addAll(Optional.ofNullable(RetryUtils.retry(() -> Unirest.get(url).asString()))
-                .map(HttpResponse::getBody)
-                .map(body -> StringUtils.split(body, "\n"))
-                .map(Arrays::asList)
-                .orElse(Lists.newArrayList())
-                .stream()
-                .map(str -> StringUtils.split(str, "\t"))
-                .filter(array -> array.length == 2)
-                .map(array -> new HttpHost(array[0], Integer.parseInt(array[1])))
-                .collect(Collectors.toList()));
+        } catch (Exception e) {
+            log.error("refresh proxy failure.", e);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
         if (proxyContainer.size() > 5) {
             proxyContainer = proxyContainer.stream().skip(proxyContainer.size() - 5).collect(Collectors.toList());
         }

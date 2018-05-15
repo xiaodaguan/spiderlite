@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -18,12 +18,12 @@ import java.util.Optional;
  */
 @Component(value = "countPersister")
 @Slf4j
-public class CountPersister implements IProcessor<Task> {
+public class CountPersister extends BaseProcessor {
 
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Object parsed = Optional.ofNullable(task.getCtx())
                 .map(ctx -> ctx.get("parsed"))
                 .orElse(0);

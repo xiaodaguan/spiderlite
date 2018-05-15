@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.taotalcount;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -13,9 +13,9 @@ import java.util.Optional;
  * @date 2018/5/10
  */
 @Component("keCountStarter")
-public class Starter implements IProcessor<Task> {
+public class Starter extends BaseProcessor {
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         String cityId = Optional.of(task.getCtx()).map(ctx -> ctx.get("cityId")).map(String::valueOf).orElse("");
         task.getCtx().putAll(
                 Maps.newHashMap(ImmutableMap.<String, Object>builder()

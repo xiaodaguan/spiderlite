@@ -39,19 +39,22 @@ public abstract class BaseSpider {
                     .map(ctx -> ctx.get("stopFlip"))
                     .map(Boolean.class::cast)
                     .orElse(false);
-            handler.process(task);
-            if (next.length > 0) {
-                Arrays.stream(next).forEach(pro -> {
-                    if (stopFlag && pro instanceof IFlipper) {
-                        log.info("stop flip over {}->{}, task={}",
-                                handler.getClass().getSimpleName(),
-                                Arrays.stream(next).map(pro1 -> pro1.getClass().getSimpleName()).collect(Collectors.joining(",", "[", "]")),
-                                JSON.toJSONString(msg.body()));
-                        return;
-                    }
-                    eb.send(pro.getClass().getName(), task);
-                });
-            }
+            handler.process(task, (t) -> {
+                if (next.length > 0) {
+                    Arrays.stream(next).forEach(pro -> {
+                        if (stopFlag && pro instanceof IFlipper) {
+                            log.info("stop flip over {}->{}, task={}",
+                                    handler.getClass().getSimpleName(),
+                                    Arrays.stream(next).map(pro1 -> pro1.getClass().getSimpleName()).collect(Collectors.joining(",", "[", "]")),
+                                    JSON.toJSONString(msg.body()));
+                            return;
+                        }
+                        eb.send(pro.getClass().getName(), t);
+                    });
+                }
+            });
+
+
         });
 
     }
@@ -60,7 +63,7 @@ public abstract class BaseSpider {
      * @param handler
      */
     protected void setTerminate(IProcessor handler) {
-        this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> handler.process(msg.body()));
+        this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> handler.process(msg.body(), (t) -> {}));
     }
 
     protected void launch(Task task) {

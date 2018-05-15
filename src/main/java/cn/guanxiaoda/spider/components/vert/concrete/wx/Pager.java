@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
-import cn.guanxiaoda.spider.components.vert.IFlipper;
+import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import java.util.Optional;
  */
 @Component("wxPager")
 @Slf4j
-public class Pager implements IFlipper<Task> {
+public class Pager extends BaseProcessor {
     @Override
-    public void process(Task task) {
+    public void doProcess(Task task) {
         Optional.ofNullable(task.getCtx().get("parsed"))
                 .map(obj -> (List<Map<String, Object>>) obj)
                 .ifPresent(list -> {

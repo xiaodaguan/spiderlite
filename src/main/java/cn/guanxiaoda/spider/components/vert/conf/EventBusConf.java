@@ -18,7 +18,6 @@ public class EventBusConf {
 
     static {
         opt.setMaxEventLoopExecuteTime((7 * 24 * 3600L) * 1000 * 1000 * 1000);
-
     }
 
     @Bean
