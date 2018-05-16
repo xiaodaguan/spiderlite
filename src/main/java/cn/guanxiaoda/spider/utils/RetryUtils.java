@@ -24,7 +24,8 @@ public class RetryUtils {
                     .retryIfException()
                     .withStopStrategy(StopStrategies.stopAfterAttempt(5))
                     .withWaitStrategy(WaitStrategies.randomWait(500, TimeUnit.MILLISECONDS, 1000, TimeUnit.MILLISECONDS))
-                    .build().call(callable);
+                    .build()
+                    .call(callable);
         } catch (Exception e) {
             log.error("retry failure", e);
         }

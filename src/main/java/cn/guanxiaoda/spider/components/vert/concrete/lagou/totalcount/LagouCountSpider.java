@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount;
 
-import cn.guanxiaoda.spider.components.vert.BaseSpider;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;

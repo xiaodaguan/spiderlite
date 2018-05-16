@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -33,7 +33,8 @@ public class Parser extends BaseProcessor {
                 .ifPresent(body -> {
                     List result = Optional.of(Extractors.on(body).extract(json("$.body")).asString())
                             .filter(StringUtils::isNotBlank)
-                            .map(html -> Extractors.on(html).split(selector("div.flexbox.html"))
+                            .map(html -> Extractors.on(html).split(selector("li.pictext.html"))
+                                    .extract("href", selector("a.attr(href)"))
                                     .extract("name", selector("div.item_list>div.item_main.text"))
                                     .extract("rawText", selector("div.item_list>div.item_other.text"))
                                     .extract("tags", selector("div.item_list>div.tag_box.text"))
@@ -41,6 +42,8 @@ public class Parser extends BaseProcessor {
                                     .extract("unitPrice", selector("div.item_list>div.item_minor>span.unit_price.text"))
                                     .asMapList()
                                     .stream()
+                                    .peek(m -> m.put("cityId", String.valueOf(task.getCtx().get("cityId"))))
+                                    .peek(m -> m.put("uniqueKey", m.get("href")))
                                     .map(m -> Optional.ofNullable(m.get("rawText"))
                                             .map(text -> StringUtils.split(text, '/'))
                                             .filter(splited -> splited.length == 4)

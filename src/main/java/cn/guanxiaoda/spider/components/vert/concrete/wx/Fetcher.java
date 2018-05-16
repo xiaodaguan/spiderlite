@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
-import cn.guanxiaoda.spider.components.vert.BaseFetcher;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseFetcher;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.utils.RetryUtils;

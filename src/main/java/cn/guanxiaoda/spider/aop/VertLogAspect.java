@@ -29,29 +29,29 @@ public class VertLogAspect {
 
     @Before("log()")
     public void logBefore(JoinPoint joinPoint) {
-        Object[] args = joinPoint.getArgs();
-        for (Object arg : args) {
-            if (arg instanceof Task) {
-                log.info("before {} process: stage={}, task={}",
-                        joinPoint.getTarget().getClass().getSimpleName(),
-                        ((Task) arg).getStage()
-                        , JSON.toJSONString(arg));
-            }
-        }
+//        Object[] args = joinPoint.getArgs();
+//        for (Object arg : args) {
+//            if (arg instanceof Task) {
+//                log.info("before {} process: stage={}, task={}",
+//                        joinPoint.getTarget().getClass().getSimpleName(),
+//                        ((Task) arg).getStage()
+//                        , JSON.toJSONString(arg));
+//            }
+//        }
     }
 
     @After("log()")
     public void logAfter(JoinPoint joinPoint) {
-        Object[] args = joinPoint.getArgs();
-        for (Object arg : args) {
-            if (arg instanceof Task) {
-                log.info("after {} process: stage={}, task={}",
-                        joinPoint.getTarget().getClass().getSimpleName(),
-                        ((Task) arg).getStage()
-                        , JSON.toJSONString(arg));
-                monitor.tell((Task) arg);
-            }
-        }
+//        Object[] args = joinPoint.getArgs();
+//        for (Object arg : args) {
+//            if (arg instanceof Task) {
+//                log.info("after {} process: stage={}, task={}",
+//                        joinPoint.getTarget().getClass().getSimpleName(),
+//                        ((Task) arg).getStage()
+//                        , JSON.toJSONString(arg));
+//                monitor.tell((Task) arg);
+//            }
+//        }
     }
 
 

@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.taotalcount;
 
-import cn.guanxiaoda.spider.components.vert.BaseSpider;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -33,8 +33,13 @@ public class KeCountSpider extends BaseSpider {
 
         Stream.of(
                 //城市列表
-                "sy",
-                "bj"
+                "bj",
+                "sh",
+                "gz",
+                "sz",
+                "cd",
+                "hz"
+
         ).map(cityId ->
                 Task.builder()
                         .ctx(

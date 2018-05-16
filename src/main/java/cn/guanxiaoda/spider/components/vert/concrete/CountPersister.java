@@ -1,6 +1,5 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
-import cn.guanxiaoda.spider.components.vert.BaseProcessor;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;

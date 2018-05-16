@@ -2,7 +2,7 @@ package cn.guanxiaoda.spider.proxy;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import lombok.Synchronized;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -40,6 +40,7 @@ public class GobanjiaProxyManager implements IProxyManager {
 
     private static List<String> proxyContainer;
     private static CloseableHttpClient client = HttpClientBuilder.create().build();
+    private static RateLimiter rl = RateLimiter.create(1);
     @Value("${proxy.vendor.url}")
     public String url;
 
@@ -70,8 +71,7 @@ public class GobanjiaProxyManager implements IProxyManager {
     }
 
     @Override
-    @Synchronized
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 1500)
     public void refresh() {
         if (proxyContainer == null) {
             proxyContainer = Lists.newArrayList();
@@ -80,23 +80,36 @@ public class GobanjiaProxyManager implements IProxyManager {
         HttpGet get = new HttpGet(url);
         CloseableHttpResponse response = null;
         try {
+            rl.acquire();
             response = client.execute(get);
             if (200 != response.getStatusLine().getStatusCode()) {
                 log.warn("didn't get proxy");
                 return;
             }
-            proxyContainer.addAll(Optional.of(response)
-                    .map(resp -> {
-                        try {
-                            return EntityUtils.toString(resp.getEntity());
-                        } catch (IOException e) {
-                            log.error("consume entity failure", e);
-                            return null;
-                        }
-                    })
-                    .map(body -> StringUtils.split(body, "\n"))
-                    .map(Arrays::asList)
-                    .orElse(Lists.newArrayList()));
+            proxyContainer.addAll(
+                    Optional.of(response)
+                            .map(resp -> {
+                                try {
+                                    return EntityUtils.toString(resp.getEntity());
+                                } catch (IOException e) {
+                                    log.error("consume entity failure", e);
+                                    return null;
+                                }
+                            })
+                            .map(body -> StringUtils.split(body, "\n"))
+                            .map(Arrays::asList)
+                            .map(list -> list.stream()
+                                    .peek(str -> {
+                                        if (str.contains("请控制好请求频率")) {
+                                            log.error("request proxy vendor failure");
+                                        }
+                                    })
+                                    .filter(str -> StringUtils.split(str, ":").length == 2)
+                                    .collect(Collectors.toList())
+                            )
+                            .orElse(Lists.newArrayList())
+
+            );
 
         } catch (Exception e) {
             log.error("refresh proxy failure.", e);
@@ -110,9 +123,10 @@ public class GobanjiaProxyManager implements IProxyManager {
             }
         }
 
-
-        if (proxyContainer.size() > 5) {
-            proxyContainer = proxyContainer.stream().skip(proxyContainer.size() - 5).collect(Collectors.toList());
+        synchronized (this) {
+            if (proxyContainer.size() > 10) {
+                proxyContainer = proxyContainer.stream().skip(proxyContainer.size() - 5).collect(Collectors.toList());
+            }
         }
     }
 

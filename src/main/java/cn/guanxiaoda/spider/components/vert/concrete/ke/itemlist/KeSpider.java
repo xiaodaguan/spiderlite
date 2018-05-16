@@ -1,7 +1,7 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -33,14 +33,14 @@ public class KeSpider extends BaseSpider {
 
 
         mongoClient.findAllDocs("beikezhaofang_count")
-                .stream()
+                .parallelStream()
                 .map(doc -> Maps.immutableEntry(
                         doc.getString("name"),
                         (int) Math.ceil((1.0 * doc.getInteger("count")) / 30)
                         )
                 )
                 .flatMap(pair ->
-                        IntStream.range(1, pair.getValue() + 1).mapToObj(
+                        IntStream.range(1, (pair.getValue() + 1) > 100 ? 101 : pair.getValue() + 1).mapToObj(
                                 pageNo ->
                                         Task.builder()
                                                 .name("beike_list")

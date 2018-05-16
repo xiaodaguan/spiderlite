@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.BaseSpider;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -52,7 +52,7 @@ public class LagouDetailSpider extends BaseSpider {
                                     ImmutableMap.<String, Object>builder()
                                             .put("collection","lagou_detail")
                                             .put("positionId", doc.getString("positionId"))
-                                            .put("uniqueKey", doc.get("uniqueKey"))
+                                            .put("uniqueKey", doc.get("positionId"))
                                             .put("positionName", doc.getString("positionName"))
                                             .put("city", doc.getString("city"))
                                             .put("salary", doc.getString("salary"))

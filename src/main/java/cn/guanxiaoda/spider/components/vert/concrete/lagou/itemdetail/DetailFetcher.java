@@ -1,22 +1,19 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseFetcher;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.proxy.IProxyManager;
 import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,12 +23,10 @@ import java.util.Optional;
  */
 @Component(value = "lagouDetailFetcher")
 @Slf4j
-public class DetailFetcher extends BaseProcessor {
+public class DetailFetcher extends BaseFetcher {
 
     private static final String URL_TEMPLATE = "https://m.lagou.com/jobs/{positionId}.html";
 
-    private static Double limit;
-    private static RateLimiter rl;
     private static Map<String, String> headers = Maps.newHashMap(
             ImmutableMap.<String, String>builder()
 
@@ -49,15 +44,6 @@ public class DetailFetcher extends BaseProcessor {
     @Autowired ClientPool clientPool;
     @Autowired @Qualifier("gobanjiaProxyManager") private IProxyManager proxyManager;
 
-    @Value("${ratelimit.fetcher.lagou}")
-    public void setLimit(Double qps) {
-        limit = qps;
-    }
-
-    @PostConstruct
-    public void init() {
-        rl = RateLimiter.create(limit);
-    }
 
     @Override
     public void doProcess(Task task) {
