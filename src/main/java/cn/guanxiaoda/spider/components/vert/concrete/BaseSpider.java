@@ -44,6 +44,7 @@ public abstract class BaseSpider {
                     .map(Boolean.class::cast)
                     .orElse(false);
             handler.process(task, (t) -> {
+                monitor.tell(msg.body());
                 if (next.length > 0) {
                     Arrays.stream(next).forEach(pro -> {
                         if (stopFlag && pro instanceof IFlipper) {
@@ -70,6 +71,7 @@ public abstract class BaseSpider {
         this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> {
             handler.process(msg.body(), (t) -> {});
             monitor.tell(msg.body());
+            monitor.recordFinish(msg.body());
         });
     }
 

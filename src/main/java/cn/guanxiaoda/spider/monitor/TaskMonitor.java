@@ -45,11 +45,14 @@ public class TaskMonitor {
     private static List<Long> crawlTimes = new ArrayList<>();
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
+
+    public void recordFinish(Task task) {
+        crawlTimes.add(System.currentTimeMillis());
+    }
+
     public void tell(Task task) {
 
         init();
-        crawlTimes.add(System.currentTimeMillis());
-
 
         if (!totalCount.containsKey(task.getName())) {
             totalCount.put(task.getName(), new AtomicInteger());
@@ -121,8 +124,9 @@ public class TaskMonitor {
         synchronized (TaskMonitor.class) {
             crawlTimes = crawlTimes.parallelStream().filter(time -> time >= System.currentTimeMillis() - 1000 * 60).collect(Collectors.toList());
         }
-        log.info("real time crawling speed: {}/min", crawlTimes.size());
 //        save();
+        log.info("task stats: {}", JSON.toJSONString(detailCount));
+        log.info("real time crawling speed: {}/min", crawlTimes.size());
     }
 
     private void save() {

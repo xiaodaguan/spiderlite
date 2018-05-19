@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.proxy;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +37,7 @@ public abstract class BaseProxyManager implements IProxyManager {
     private static RateLimiter rl = RateLimiter.create(1);
     @Value("${proxy.vendor.url}")
     public String url;
+    Map<String, Integer> proxyFailTimeMap = new ConcurrentHashMap<>();
 
     @Override
     public HttpHost randomGetOneHttpHost() {
@@ -105,5 +109,22 @@ public abstract class BaseProxyManager implements IProxyManager {
     @PostConstruct
     public void init() {
         refresh();
+    }
+
+    @Override
+    public synchronized void removeProxy(String ipPort) {
+        if (Strings.isNullOrEmpty(ipPort)) {
+            return;
+        }
+        log.info("remove proxy from pool: {}", ipPort);
+        proxyContainer = proxyContainer.stream().filter(s -> !ipPort.equals(s)).collect(Collectors.toList());
+    }
+
+    @Override
+    public synchronized void recordProxyFailure(String ipPort) {
+        proxyFailTimeMap.put(ipPort, proxyFailTimeMap.getOrDefault(ipPort, 0) + 1);
+        if (proxyFailTimeMap.get(ipPort) > 2) {
+            removeProxy(ipPort);
+        }
     }
 }

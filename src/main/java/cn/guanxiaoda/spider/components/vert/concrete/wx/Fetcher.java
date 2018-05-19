@@ -48,8 +48,6 @@ public class Fetcher extends BaseFetcher {
                 .map(tmp -> tmp.replace("{fakeId}", fakeId))
                 .orElse("");
 
-        getRatelimiter("wxFetcher").acquire();
-
          handleRequest(task, url, headers, callback);
 
     }

@@ -46,8 +46,6 @@ public class ListFetcher extends BaseFetcher {
 
         String url = URL_TEMPLATE.replace("{positionName}", positionName).replace("{city}", city).replace("{pageNo}", String.valueOf(pageNo));
 
-        getRatelimiter("lagouListFetcher").acquire();
-
         handleRequest(task, url, headers, callback);
     }
 }

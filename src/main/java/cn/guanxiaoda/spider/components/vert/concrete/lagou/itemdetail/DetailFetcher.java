@@ -46,8 +46,6 @@ public class DetailFetcher extends BaseFetcher {
 
         String url = URL_TEMPLATE.replace("{positionId}", positionId);
 
-        getRatelimiter("lagouDetailFetcher").acquire();
-
         handleRequest(task, url, headers, callBack);
     }
 }

@@ -41,8 +41,6 @@ public class Fetcher extends BaseFetcher {
                 .map(tmp -> tmp.replace("{cityId}", cityId))
                 .orElse("");
 
-        getRatelimiter("keFetcher").acquire();
-
         handleRequest(task, url, headers, callBack);
     }
 }
