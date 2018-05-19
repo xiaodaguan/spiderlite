@@ -17,12 +17,12 @@ import java.util.Optional;
  */
 @Component(value = "countPersister")
 @Slf4j
-public class CountPersister extends BaseProcessor {
+public class CountPersister extends BaseSyncProcessor {
 
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         Object parsed = Optional.ofNullable(task.getCtx())
                 .map(ctx -> ctx.get("parsed"))
                 .orElse(0);
@@ -46,5 +46,6 @@ public class CountPersister extends BaseProcessor {
         }
 
         task.setStage("persisted");
+        return true;
     }
 }

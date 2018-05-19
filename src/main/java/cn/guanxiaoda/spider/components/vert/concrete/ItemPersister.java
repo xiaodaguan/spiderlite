@@ -17,12 +17,12 @@ import java.util.Optional;
  */
 @Component(value = "itemPersister")
 @Slf4j
-public class ItemPersister extends BaseProcessor {
+public class ItemPersister extends BaseSyncProcessor {
 
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         Object parsed = Optional.ofNullable(task.getCtx()).map(ctx -> ctx.get("parsed")).orElse(null);
 
         String collection = Optional.ofNullable(task.getCtx())
@@ -39,6 +39,6 @@ public class ItemPersister extends BaseProcessor {
         } else {
             log.error("illegal parse result type, parsed={}", parsed);
         }
-
+        return true;
     }
 }

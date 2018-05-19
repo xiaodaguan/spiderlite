@@ -3,41 +3,92 @@ package cn.guanxiaoda.spider.components.vert.concrete;
 import cn.guanxiaoda.spider.components.vert.ICallBack;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.RateLimiter;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author guanxiaoda
  * @date 2018/5/15
  */
 @Slf4j
-public abstract class BaseFetcher extends BaseProcessor {
-    protected static RateLimiter rl = RateLimiter.create(5);
+public abstract class BaseFetcher extends BaseAsyncProcessor {
+
+    /**
+     * key: fetcherName, e.g. lagouListFetcher
+     */
+    private static Map<String, RateLimiter> rlMap = new ConcurrentHashMap<>();
     protected @Autowired ClientPool clientPool;
-    ExecutorService pool = new ThreadPoolExecutor(20, 20, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(), new ThreadFactoryBuilder().setNameFormat("fetcher-pool-%d").build());
+    @Value("${fetch.ratelimit}") private String rlStr;
 
-    @Override
-    public void process(Task task, ICallBack callback) {
-        pool.submit(() -> {
+    @PostConstruct
+    public void init() {
+        rlMap = Maps.newConcurrentMap();
+        rlMap.putAll(
+                JSON.parseObject(Optional.ofNullable(rlStr).orElse(""), new TypeReference<Map<String, Double>>() {})
+                        .entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> RateLimiter.create(entry.getValue())))
+        );
+    }
 
-            doProcess(task);
-
-            try {
-                callback.call(task);
-                monitor.tell(task);
-            } catch (Exception e) {
-                log.error("callback failure", e);
-            }
-        });
+    protected RateLimiter getRatelimiter(String fetcherName) {
+        return rlMap.getOrDefault(fetcherName, RateLimiter.create(0.1));
     }
 
     @Override
-    public abstract void doProcess(Task task);
+    public abstract void doProcess(Task task, ICallBack callBack);
+
+    protected void handleRequest(Task task, String url, Map<String, String> headers, ICallBack callBack) {
+        clientPool.getOkClient()
+                .newCall(new Request.Builder()
+                        .headers(Headers.of(headers))
+                        .url(url)
+                        .build())
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        log.error("http client call failure", e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Optional.ofNullable(response.body())
+                                .map(body -> {
+                                    try {
+                                        return body.string();
+                                    } catch (IOException e) {
+                                        log.error("get body string failure", e);
+                                        return null;
+                                    }
+                                })
+                                .ifPresent(content -> {
+                                    if (StringUtils.isBlank(content)) {
+                                        return;
+                                    }
+
+                                    task.setStage("fetched");
+                                    task.getCtx().put("fetched", content);
+                                    callBack.call(task);
+                                });
+
+                    }
+                });
+    }
 }

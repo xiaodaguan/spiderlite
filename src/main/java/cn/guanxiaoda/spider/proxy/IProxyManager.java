@@ -3,6 +3,7 @@ package cn.guanxiaoda.spider.proxy;
 import org.apache.http.HttpHost;
 
 import java.net.SocketAddress;
+import java.util.List;
 
 /**
  * @author guanxiaoda
@@ -10,6 +11,8 @@ import java.net.SocketAddress;
  */
 public interface IProxyManager {
     HttpHost randomGetOneHttpHost();
+
     SocketAddress randomGetOneAddress();
-    void refresh();
+
+    List<String> getIpPortList(String content);
 }

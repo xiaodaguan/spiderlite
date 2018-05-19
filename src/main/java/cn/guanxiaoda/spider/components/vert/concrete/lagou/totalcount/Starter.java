@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
  * @date 2018/5/10
  */
 @Component("lagouCountStarter")
-public class Starter extends BaseProcessor {
+public class Starter extends BaseSyncProcessor {
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         task.setStage("init");
+        return true;
     }
 }

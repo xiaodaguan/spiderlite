@@ -8,6 +8,4 @@ import cn.guanxiaoda.spider.models.Task;
  */
 public interface IProcessor<T> {
     void process(T t, ICallBack callback);
-
-    void doProcess(Task task);
 }

@@ -26,6 +26,7 @@ public abstract class BaseSpider {
 
 
     @Autowired @Qualifier("mongoClient") protected IMongoDbClient mongoClient;
+    @Autowired TaskMonitor monitor;
     @Autowired
     private EventBus eb;
     private String starterAddr;
@@ -66,7 +67,10 @@ public abstract class BaseSpider {
      * @param handler
      */
     protected void setTerminate(IProcessor handler) {
-        this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> handler.process(msg.body(), (t) -> {}));
+        this.eb.consumer(handler.getClass().getName(), (Handler<Message<Task>>) msg -> {
+            handler.process(msg.body(), (t) -> {});
+            monitor.tell(msg.body());
+        });
     }
 
     protected void launch(Task task) {

@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -13,9 +13,9 @@ import java.util.Optional;
  * @date 2018/5/10
  */
 @Component("wxStarter")
-public class Starter extends BaseProcessor {
+public class Starter extends BaseSyncProcessor {
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         String fakeId = Optional.of(task.getCtx()).map(ctx -> ctx.get("fakeId")).map(String::valueOf).orElse("");
         String token = Optional.of(task.getCtx()).map(ctx -> ctx.get("token")).map(String::valueOf).orElse("");
         String cookies = Optional.of(task.getCtx()).map(ctx -> ctx.get("cookies")).map(String::valueOf).orElse("");
@@ -35,5 +35,6 @@ public class Starter extends BaseProcessor {
                 )
         );
         task.setStage("init");
+        return true;
     }
 }

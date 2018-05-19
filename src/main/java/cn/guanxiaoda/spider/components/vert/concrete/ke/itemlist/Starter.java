@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -13,9 +13,9 @@ import java.util.Optional;
  * @date 2018/5/10
  */
 @Component("keStarter")
-public class Starter extends BaseProcessor {
+public class Starter extends BaseSyncProcessor {
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         String cityId = Optional.of(task.getCtx()).map(ctx -> ctx.get("cityId")).map(String::valueOf).orElse("");
         Integer pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).get();
         task.getCtx().putAll(
@@ -29,5 +29,6 @@ public class Starter extends BaseProcessor {
                 )
         );
         task.setStage("init");
+        return true;
     }
 }

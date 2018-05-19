@@ -1,16 +1,12 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
+import cn.guanxiaoda.spider.components.vert.ICallBack;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseFetcher;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
-import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.RateLimiter;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +21,6 @@ import java.util.Optional;
 @Slf4j
 public class Fetcher extends BaseFetcher {
 
-    private static RateLimiter rl = RateLimiter.create(0.1);
     private static Map<String, String> headers = Maps.newHashMap(
             ImmutableMap.<String, String>builder()
                     .put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
@@ -40,11 +35,11 @@ public class Fetcher extends BaseFetcher {
     );
     @Autowired ClientPool clientPool;
 
+
     @Override
-    public void doProcess(Task task) {
+    public void doProcess(Task task, ICallBack callback) {
         String token = Optional.of(task.getCtx()).map(ctx -> ctx.get("token")).map(String::valueOf).orElse("");
         String fakeId = Optional.of(task.getCtx()).map(ctx -> ctx.get("fakeId")).map(String::valueOf).orElse("");
-        String cookies = Optional.of(task.getCtx()).map(ctx -> ctx.get("cookies")).map(String::valueOf).orElse("");
         int pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).orElse(1);
         int pageSize = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageSize")).map(Integer.class::cast).orElse(10);
         String url = Optional.of(task.getCtx()).map(ctx -> ctx.get("url")).map(String::valueOf)
@@ -53,21 +48,10 @@ public class Fetcher extends BaseFetcher {
                 .map(tmp -> tmp.replace("{fakeId}", fakeId))
                 .orElse("");
 
-        Unirest.setHttpClient(clientPool.getApacheClient());
-        rl.acquire();
-        HttpResponse<String> response = RetryUtils.retry(() -> Unirest.get(url)
-                .header("Cookie", cookies)
-                .headers(headers)
-                .asString()
-        );
+        getRatelimiter("wxFetcher").acquire();
 
-        Optional.ofNullable(response).ifPresent(resp -> {
-            if (resp.getStatus() != HttpStatus.SC_OK) {
-                return;
-            }
-            task.getCtx().put("fetched", response.getBody());
-            task.setStage("fetched");
-        });
+         handleRequest(task, url, headers, callback);
+
     }
 
 }

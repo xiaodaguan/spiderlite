@@ -1,13 +1,11 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou;
 
+import cn.guanxiaoda.spider.components.vert.ICallBack;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseFetcher;
 import cn.guanxiaoda.spider.models.Task;
-import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-import okhttp3.Request;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
@@ -39,31 +37,17 @@ public class ListFetcher extends BaseFetcher {
                     .build()
     );
 
+
     @Override
-    public void doProcess(Task task) {
+    public void doProcess(Task task, ICallBack callback) {
         String city = Optional.of(task.getCtx()).map(ctx -> ctx.get("city")).map(String::valueOf).map(URLEncoder::encode).orElse("");
         String positionName = Optional.of(task.getCtx()).map(ctx -> ctx.get("positionName")).map(String::valueOf).orElse("");
         Integer pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(String::valueOf).map(Integer::parseInt).orElse(1);
 
         String url = URL_TEMPLATE.replace("{positionName}", positionName).replace("{city}", city).replace("{pageNo}", String.valueOf(pageNo));
 
-        rl.acquire();
+        getRatelimiter("lagouListFetcher").acquire();
 
-        String response = RetryUtils.retry(() ->
-                clientPool.getOkClient()
-                        .newCall(new Request.Builder()
-                                .headers(Headers.of(headers))
-                                .url(url)
-                                .build())
-                        .execute()
-                        .body()
-                        .string());
-
-        Optional.ofNullable(response)
-                .ifPresent(resp -> {
-                    task.getCtx().put("fetched", resp);
-                    task.setStage("fetched");
-                });
+        handleRequest(task, url, headers, callback);
     }
-
 }

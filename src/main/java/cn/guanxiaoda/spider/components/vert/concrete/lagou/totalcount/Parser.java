@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import im.nll.data.extractor.Extractors;
 import org.springframework.stereotype.Component;
@@ -14,11 +14,11 @@ import static im.nll.data.extractor.Extractors.json;
  * @date 2018/4/17
  */
 @Component(value = "lagouCountParser")
-public class Parser extends BaseProcessor {
+public class Parser extends BaseSyncProcessor {
 
 
     @Override
-    public void doProcess(Task task) {
+    public boolean doProcess(Task task) {
         Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))
                 .map(String::valueOf)
@@ -28,5 +28,6 @@ public class Parser extends BaseProcessor {
                     task.getCtx().put("parsed", totalCount);
                     task.setStage("parsed");
                 });
+        return true;
     }
 }

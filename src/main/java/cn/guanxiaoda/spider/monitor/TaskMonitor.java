@@ -5,6 +5,7 @@ import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,8 +14,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author guanxiaoda
@@ -22,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component("taskMonitor")
 @EnableScheduling
+@Slf4j
 public class TaskMonitor {
 
     private static final String MONITOR_COLLECTION = "monitor_collection";
@@ -35,11 +42,15 @@ public class TaskMonitor {
      * task name, stage, count
      */
     private static ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> detailCount;
+    private static List<Long> crawlTimes = new ArrayList<>();
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoDbClient;
 
     public void tell(Task task) {
 
         init();
+        crawlTimes.add(System.currentTimeMillis());
+
+
         if (!totalCount.containsKey(task.getName())) {
             totalCount.put(task.getName(), new AtomicInteger());
         }
@@ -76,38 +87,45 @@ public class TaskMonitor {
         return JSON.toJSONString(detailCount);
     }
 
-//    private void load() {
-//        totalCount = Maps.newConcurrentMap();
-//        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
-//                ImmutableMap.<String, Object>builder()
-//                        .put("_id", TOTAL_ID)
-//                        .build())))
-//                .map(doc -> doc.get("map"))
-//                .map(Map.class::cast)
-//                .ifPresent(map -> map
-//                        .forEach((k, v) -> totalCount.put((String) k, new AtomicInteger((Integer) v))));
-//
-//        detailCount = Maps.newConcurrentMap();
-//        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
-//                ImmutableMap.<String, Object>builder()
-//                        .put("_id", DETAIL_ID)
-//                        .build())))
-//                .map(doc -> doc.get("map"))
-//                .map(Map.class::cast)
-//                .ifPresent(map -> map.forEach((k, v) -> {
-//                    String spider = (String) k;
-//                    detailCount.put(spider, Maps.newConcurrentMap());
-//                    ((Map<String, Integer>) v)
-//                            .forEach((stage, count) -> detailCount.get(spider).put(stage, new AtomicInteger(count)));
-//                }));
-//
-//    }
+    private void load() {
+        totalCount = Maps.newConcurrentMap();
+        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
+                ImmutableMap.<String, Object>builder()
+                        .put("_id", TOTAL_ID)
+                        .build())))
+                .map(doc -> doc.get("map"))
+                .map(Map.class::cast)
+                .ifPresent(map -> map
+                        .forEach((k, v) -> totalCount.put((String) k, new AtomicInteger((Integer) v))));
+
+        detailCount = Maps.newConcurrentMap();
+        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
+                ImmutableMap.<String, Object>builder()
+                        .put("_id", DETAIL_ID)
+                        .build())))
+                .map(doc -> doc.get("map"))
+                .map(Map.class::cast)
+                .ifPresent(map -> map.forEach((k, v) -> {
+                    String spider = (String) k;
+                    detailCount.put(spider, Maps.newConcurrentMap());
+                    ((Map<String, Integer>) v)
+                            .forEach((stage, count) -> detailCount.get(spider).put(stage, new AtomicInteger(count)));
+                }));
+
+    }
 
     @Scheduled(fixedRate = 1000 * 5)
     private void persist() {
 
         init();
+        synchronized (TaskMonitor.class) {
+            crawlTimes = crawlTimes.parallelStream().filter(time -> time >= System.currentTimeMillis() - 1000 * 60).collect(Collectors.toList());
+        }
+        log.info("real time crawling speed: {}/min", crawlTimes.size());
+//        save();
+    }
 
+    private void save() {
         mongoDbClient.save(MONITOR_COLLECTION, Maps.newHashMap(
                 ImmutableMap.<String, Object>builder().put("_id", TOTAL_ID)
                         .put("map", totalCount)
