@@ -74,6 +74,9 @@
 
     <dependencies>
 
+
+
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -165,10 +168,7 @@
             <artifactId>extractor</artifactId>
             <version>0.9.6</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>json-path</artifactId>
-                    <groupId>com.jayway.jsonpath</groupId>
-                </exclusion>
+
                 <exclusion>
                     <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>

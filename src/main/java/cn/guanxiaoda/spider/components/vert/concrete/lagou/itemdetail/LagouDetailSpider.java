@@ -1,19 +1,23 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * @author guanxiaoda
  * @date 2018/4/13
  */
 @Component(value = "lagouDetailSpider")
+@Slf4j
 public class LagouDetailSpider extends BaseSpider {
 
     @Autowired @Qualifier("lagouDetailStarter") IProcessor<Task> starter;
@@ -46,24 +50,30 @@ public class LagouDetailSpider extends BaseSpider {
 //    "companyFullName" : "北京兔玩在线科技有限公司",
 //    "crawlTime" : "2018-05-15 11:51:19"
 //}
-                    return Task.builder()
-                            .name("lagou-detail")
-                            .ctx(Maps.newHashMap(
-                                    ImmutableMap.<String, Object>builder()
-                                            .put("collection","lagou_detail")
-                                            .put("positionId", doc.getString("positionId"))
-                                            .put("uniqueKey", doc.get("positionId"))
-                                            .put("positionName", doc.getString("positionName"))
-                                            .put("city", doc.getString("city"))
-                                            .put("salary", doc.getString("salary"))
-                                            .put("companyId", doc.getString("companyId"))
-                                            .put("companyLogo", doc.getString("companyLogo"))
-                                            .put("companyName", doc.getString("companyName"))
-                                            .put("companyFullName", doc.getString("companyFullName"))
-                                            .build()
-                            ))
-                            .build();
+                    try {
+                        return Task.builder()
+                                .name("lagou-detail")
+                                .ctx(Maps.newHashMap(
+                                        ImmutableMap.<String, Object>builder()
+                                                .put("collection", "lagou_detail")
+                                                .put("positionId", doc.getString("positionId"))
+                                                .put("uniqueKey", doc.get("positionId"))
+                                                .put("positionName", doc.getString("positionName"))
+                                                .put("city", doc.getString("city"))
+                                                .put("salary", doc.getString("salary"))
+                                                .put("companyId", doc.getString("companyId"))
+                                                .put("companyLogo", doc.getString("companyLogo"))
+                                                .put("companyName", doc.getString("companyName"))
+                                                .put("companyFullName", doc.getString("companyFullName"))
+                                                .build()
+                                ))
+                                .build();
+                    } catch (Exception e) {
+                        log.error("generate task failure", e);
+                        return null;
+                    }
                 })
+                .filter(Objects::nonNull)
                 .forEach(this::launch);
     }
 

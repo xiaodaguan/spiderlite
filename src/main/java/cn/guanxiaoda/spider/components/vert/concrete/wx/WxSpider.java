@@ -22,7 +22,7 @@ public class WxSpider extends BaseSpider {
     @Autowired @Qualifier("wxFetcher") IProcessor<Task> fetcher;
     @Autowired @Qualifier("wxParser") IProcessor<Task> parser;
     @Autowired @Qualifier("wxPersister") IProcessor<Task> persister;
-    @Autowired @Qualifier("wxPager") IProcessor<Task> pager;
+    @Autowired @Qualifier("commonFlipper") IProcessor<Task> pager;
 
     public void start() {
 

@@ -22,6 +22,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -52,6 +53,12 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
     @PostConstruct
     public void init() {
         rlMap = Maps.newConcurrentMap();
+        refresh();
+    }
+
+    @Scheduled(fixedRate = 1000)
+    protected void refresh() {
+        rlMap.clear();
         rlMap.putAll(
                 JSON.parseObject(Optional.ofNullable(rlStr).orElse(""), new TypeReference<Map<String, Double>>() {})
                         .entrySet().stream()
@@ -122,7 +129,6 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
                                         if (StringUtils.isBlank(content)) {
                                             return;
                                         }
-
                                         task.setStage("fetched");
                                         task.getCtx().put("fetched", content);
                                         callBack.call(task);

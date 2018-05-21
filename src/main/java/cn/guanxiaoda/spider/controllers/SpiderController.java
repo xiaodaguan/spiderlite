@@ -6,6 +6,7 @@ import cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail.LagouDetai
 import cn.guanxiaoda.spider.components.vert.concrete.lagou.itemlist.LagouListSpider;
 import cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount.LagouCountSpider;
 import cn.guanxiaoda.spider.components.vert.concrete.wx.WxSpider;
+import cn.guanxiaoda.spider.components.vert.concrete.zhipin.list.ZhipinListSpider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -21,11 +22,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SpiderController {
 
     @Autowired @Qualifier("wxSpider") WxSpider wxSpider;
+
     @Autowired @Qualifier("keSpider") KeSpider keSpider;
     @Autowired @Qualifier("keCountSpider") KeCountSpider keCountSpider;
+
     @Autowired @Qualifier("lagouCountSpider") LagouCountSpider lagouCountSpider;
     @Autowired @Qualifier("lagouListSpider") LagouListSpider lagouListSpider;
     @Autowired @Qualifier("lagouDetailSpider") LagouDetailSpider lagouDetailSpider;
+
+    @Autowired @Qualifier("zhipinListSpider") ZhipinListSpider zhipinListSpider;
 
     @GetMapping("/wx/start")
     public void wxStart() { wxSpider.start(); }
@@ -45,4 +50,9 @@ public class SpiderController {
 
     @GetMapping("lagou/detail/start")
     public void lagouDetailStart() { lagouDetailSpider.start();}
+
+
+    @GetMapping("zhipin/list/start")
+    public void zhipinListStart() { zhipinListSpider.start();}
+
 }

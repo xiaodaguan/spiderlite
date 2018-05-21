@@ -1,6 +1,5 @@
-package cn.guanxiaoda.spider.components.vert.concrete.wx;
+package cn.guanxiaoda.spider.components.vert.concrete;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -16,9 +15,9 @@ import java.util.Optional;
  * @author guanxiaoda
  * @date 2018/5/10
  */
-@Component("wxPager")
+@Component("commonFlipper")
 @Slf4j
-public class Pager extends BaseSyncProcessor {
+public class Flipper extends BaseSyncProcessor {
     @Override
     public boolean doProcess(Task task) {
         List<Map<String, Object>> list = Optional.ofNullable(task.getCtx())
@@ -28,7 +27,7 @@ public class Pager extends BaseSyncProcessor {
         if (CollectionUtils.isEmpty(list)) {
             log.info("no following pages, task={}", JSON.toJSONString(task));
             task.setStage("stopped");
-            return true;
+            return false;
         }
 
         Integer maxPage = Optional.ofNullable(task.getCtx().get("maxPage")).map(Integer.class::cast).orElse(Integer.MAX_VALUE);
@@ -36,7 +35,7 @@ public class Pager extends BaseSyncProcessor {
         if (curPage >= maxPage) {
             task.setStage("stopped");
             log.info("reach max pages, will stop, task={}", JSON.toJSONString(task));
-            return true;
+            return false;
         }
         task.getCtx().put("pageNo", Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("pageNo"))

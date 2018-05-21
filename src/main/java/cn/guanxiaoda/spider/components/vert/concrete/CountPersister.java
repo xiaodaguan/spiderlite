@@ -27,7 +27,7 @@ public class CountPersister extends BaseSyncProcessor {
                 .map(ctx -> ctx.get("parsed"))
                 .orElse(0);
         String cityId = Optional.ofNullable(task.getCtx())
-                .map(ctx -> ctx.get("cityId"))
+                .map(ctx -> ctx.get("city"))
                 .map(String::valueOf)
                 .orElse("");
         String collection = Optional.ofNullable(task.getCtx())

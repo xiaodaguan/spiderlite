@@ -1,7 +1,7 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount;
 
-import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -31,6 +31,7 @@ public class LagouCountSpider extends BaseSpider {
         addProcessor(parser, persister);
         setTerminate(persister);
 
+
         Stream.of(
                 //城市列表
                 "北京",
@@ -43,7 +44,7 @@ public class LagouCountSpider extends BaseSpider {
                         .ctx(
                                 Maps.newHashMap(ImmutableMap.<String, Object>builder()
                                         .put("city", city)
-                                        .put("positionName", "java")
+                                        .put("positionName", "后端")
                                         .put("collection", "lagou_count")
                                         .build())
                         ).name("lagou_count").build()
