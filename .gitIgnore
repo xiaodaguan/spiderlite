@@ -5,3 +5,4 @@ spiderlite.iml
 **/resources/application.yml
 **/resources/application.properties
 **/logs/
+dist/
