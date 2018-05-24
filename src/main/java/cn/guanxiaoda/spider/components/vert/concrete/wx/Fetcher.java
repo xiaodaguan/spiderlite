@@ -36,8 +36,9 @@ public class Fetcher extends BaseFetcher {
     @Autowired ClientPool clientPool;
 
 
+
     @Override
-    public void doProcess(Task task, ICallBack callback) {
+    public void fetch(Task task, ICallBack callBack) {
         String token = Optional.of(task.getCtx()).map(ctx -> ctx.get("token")).map(String::valueOf).orElse("");
         String fakeId = Optional.of(task.getCtx()).map(ctx -> ctx.get("fakeId")).map(String::valueOf).orElse("");
         int pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).orElse(1);
@@ -48,7 +49,7 @@ public class Fetcher extends BaseFetcher {
                 .map(tmp -> tmp.replace("{fakeId}", fakeId))
                 .orElse("");
 
-         handleRequest(task, url, headers, callback);
+        handleRequest(task, url, headers, callBack);
 
     }
 

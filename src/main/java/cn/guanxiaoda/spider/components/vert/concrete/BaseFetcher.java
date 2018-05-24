@@ -4,7 +4,6 @@ import cn.guanxiaoda.spider.components.vert.ICallBack;
 import cn.guanxiaoda.spider.http.ClientPool;
 import cn.guanxiaoda.spider.models.Task;
 import cn.guanxiaoda.spider.proxy.IProxyManager;
-import cn.guanxiaoda.spider.utils.RetryUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Maps;
@@ -71,7 +70,11 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
     }
 
     @Override
-    public abstract void doProcess(Task task, ICallBack callBack);
+    public void doProcess(Task task, ICallBack callBack) {
+        fetch(task, callBack);
+    }
+
+    public abstract void fetch(Task task, ICallBack callBack);
 
     protected void handleRequest(Task task, String url, Map<String, String> headers, ICallBack callBack) {
         HttpUrl httpUrl = HttpUrl.parse(url);
@@ -82,62 +85,60 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
         RateLimiter rl = getRatelimiter(Optional.of(httpUrl).map(HttpUrl::topPrivateDomain).orElse(""));
         rl.acquire();
         OkHttpClient client = clientPool.getOkClient();
-        RetryUtils.retry(() -> {
-            client.newCall(new Request.Builder()
-                    .headers(Headers.of(headers))
-                    .url(httpUrl)
-                    .build())
-                    .enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            if (e instanceof SocketTimeoutException || e instanceof ConnectTimeoutException) {
-                                log.error("conn timeout: {}", e.getMessage());
-                            } else if (e instanceof SocketException && Optional.ofNullable(e).map(IOException::getCause)
-                                    .map(Throwable::getMessage).orElse("").contains("Connection reset")) {
-                                log.error("conn reset: {}", e.getMessage());
-                            } else if (e instanceof ConnectException && Optional.ofNullable(e).map(IOException::getCause)
-                                    .map(Throwable::getMessage).orElse("").contains("Connection refused")) {
-                                String ipPort = Optional.ofNullable(client.proxy())
-                                        .map(Proxy::address)
-                                        .map(String::valueOf)
-                                        .map(str -> str.replace("/", ""))
-                                        .orElse(null);
-                                log.error("conn refused: ipPort={}, msg={}", ipPort, e.getMessage());
-                                proxyManager.removeProxy(ipPort);
-                            } else {
-                                log.error("http client call failure", e);
-                            }
-                            proxyManager.recordProxyFailure(Optional.ofNullable(client.proxy())
+        client.newCall(new Request.Builder()
+                .headers(Headers.of(headers))
+                .url(httpUrl)
+                .build())
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        if (e instanceof SocketTimeoutException || e instanceof ConnectTimeoutException) {
+                            log.error("conn timeout: {}", e.getMessage());
+                        } else if (e instanceof SocketException && Optional.ofNullable(e).map(IOException::getCause)
+                                .map(Throwable::getMessage).orElse("").contains("Connection reset")) {
+                            log.error("conn reset: {}", e.getMessage());
+                        } else if (e instanceof ConnectException && Optional.ofNullable(e).map(IOException::getCause)
+                                .map(Throwable::getMessage).orElse("").contains("Connection refused")) {
+                            String ipPort = Optional.ofNullable(client.proxy())
                                     .map(Proxy::address)
                                     .map(String::valueOf)
                                     .map(str -> str.replace("/", ""))
-                                    .orElse(null));
+                                    .orElse(null);
+                            log.error("conn refused: ipPort={}, msg={}", ipPort, e.getMessage());
+                            proxyManager.removeProxy(ipPort);
+                        } else {
+                            log.error("http client call failure", e);
                         }
+                        retry(task);
+                        proxyManager.recordProxyFailure(Optional.ofNullable(client.proxy())
+                                .map(Proxy::address)
+                                .map(String::valueOf)
+                                .map(str -> str.replace("/", ""))
+                                .orElse(null));
+                    }
 
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            Optional.ofNullable(response.body())
-                                    .map(body -> {
-                                        try {
-                                            return body.string();
-                                        } catch (IOException e) {
-                                            log.error("get body string failure", e);
-                                            return null;
-                                        }
-                                    })
-                                    .ifPresent(content -> {
-                                        if (StringUtils.isBlank(content)) {
-                                            return;
-                                        }
-                                        task.setStage("fetched");
-                                        task.getCtx().put("fetched", content);
-                                        callBack.call(task);
-                                    });
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Optional.ofNullable(response.body())
+                                .map(body -> {
+                                    try {
+                                        return body.string();
+                                    } catch (IOException e) {
+                                        log.error("get body string failure", e);
+                                        return null;
+                                    }
+                                })
+                                .ifPresent(content -> {
+                                    if (StringUtils.isBlank(content)) {
+                                        return;
+                                    }
+                                    task.setStage("fetched");
+                                    task.getCtx().put("fetched", content);
+                                    callBack.call(task);
+                                });
 
-                        }
-                    });
-            return null;
-        });
+                    }
+                });
 
     }
 }

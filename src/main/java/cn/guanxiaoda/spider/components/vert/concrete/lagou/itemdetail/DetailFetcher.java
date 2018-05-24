@@ -41,7 +41,7 @@ public class DetailFetcher extends BaseFetcher {
 
 
     @Override
-    public void doProcess(Task task, ICallBack callBack) {
+    public void fetch(Task task, ICallBack callBack) {
         String positionId = Optional.of(task.getCtx()).map(ctx -> ctx.get("positionId")).map(String::valueOf).orElse("");
 
         String url = URL_TEMPLATE.replace("{positionId}", positionId);

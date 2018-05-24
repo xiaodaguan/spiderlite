@@ -33,7 +33,7 @@ public class Fetcher extends BaseFetcher {
 
 
     @Override
-    public void doProcess(Task task, ICallBack callBack) {
+    public void fetch(Task task, ICallBack callBack) {
         String cityId = Optional.of(task.getCtx()).map(ctx -> ctx.get("cityId")).map(String::valueOf).orElse("");
         int pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(Integer.class::cast).orElse(1);
         String url = Optional.of(task.getCtx()).map(ctx -> ctx.get("url")).map(String::valueOf)

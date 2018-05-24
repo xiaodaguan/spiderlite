@@ -1,7 +1,7 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.taotalcount;
 
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
-import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -18,10 +18,10 @@ import java.util.stream.Stream;
 @Component(value = "keCountSpider")
 public class KeCountSpider extends BaseSpider {
 
-    @Autowired @Qualifier("keCountStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("keFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("keCountParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("countPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("keCountStarter") BaseProcessor starter;
+    @Autowired @Qualifier("keFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("keCountParser") BaseProcessor parser;
+    @Autowired @Qualifier("countPersister") BaseProcessor persister;
 
     public void start() {
 

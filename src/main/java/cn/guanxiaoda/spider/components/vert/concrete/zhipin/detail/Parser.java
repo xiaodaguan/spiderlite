@@ -21,6 +21,7 @@ import static im.nll.data.extractor.Extractors.selector;
 @Component(value = "zhipinDetailParser")
 public class Parser extends BaseSyncProcessor {
 
+
     private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override

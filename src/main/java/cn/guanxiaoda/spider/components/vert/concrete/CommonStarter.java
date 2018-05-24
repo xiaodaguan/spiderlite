@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
+import cn.guanxiaoda.spider.annotation.Processor;
 import cn.guanxiaoda.spider.models.Task;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ public class CommonStarter extends BaseSyncProcessor {
 
     @Override
     public boolean doProcess(Task task) {
-        task.setStage("init");
+        task.setStage("start");
         return true;
     }
 }

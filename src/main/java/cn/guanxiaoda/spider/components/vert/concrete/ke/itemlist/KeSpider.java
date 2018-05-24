@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -18,10 +18,10 @@ import java.util.stream.IntStream;
 @Component(value = "keSpider")
 public class KeSpider extends BaseSpider {
 
-    @Autowired @Qualifier("keStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("keFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("keParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("itemPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("keStarter") BaseProcessor starter;
+    @Autowired @Qualifier("keFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("keParser") BaseProcessor parser;
+    @Autowired @Qualifier("itemPersister") BaseProcessor persister;
 
     public void start() {
 

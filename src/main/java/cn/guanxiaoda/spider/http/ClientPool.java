@@ -35,11 +35,11 @@ public class ClientPool {
 
     @Autowired @Qualifier("gobanjiaProxyManager") private IProxyManager proxyManager;
 
-    public CloseableHttpClient getApacheClient() {
+    CloseableHttpClient getApacheClient() {
         RequestConfig conf = RequestConfig.custom()
-                .setConnectTimeout(10000)
-                .setSocketTimeout(10000)
-                .setConnectionRequestTimeout(10000)
+                .setConnectTimeout(5000)
+                .setSocketTimeout(5000)
+                .setConnectionRequestTimeout(5000)
                 .setProxy(proxyManager.randomGetOneHttpHost())
                 .build();
         return HttpClientBuilder.create()

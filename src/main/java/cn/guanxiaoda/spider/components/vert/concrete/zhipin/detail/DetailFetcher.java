@@ -42,4 +42,11 @@ public class DetailFetcher extends BaseFetcher {
 
         handleRequest(task, url, headers, callback);
     }
+
+    @Override
+    public void fetch(Task task, ICallBack callBack) {
+
+    }
+
+
 }

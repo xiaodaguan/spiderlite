@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemlist;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
@@ -24,10 +24,10 @@ import java.util.stream.IntStream;
 @Slf4j
 public class LagouListSpider extends BaseSpider {
 
-    @Autowired @Qualifier("lagouListStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("lagouListFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("lagouListParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("itemPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("lagouListStarter") BaseProcessor starter;
+    @Autowired @Qualifier("lagouListFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("lagouListParser") BaseProcessor parser;
+    @Autowired @Qualifier("itemPersister") BaseProcessor persister;
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoClient;
 
     public void start() {

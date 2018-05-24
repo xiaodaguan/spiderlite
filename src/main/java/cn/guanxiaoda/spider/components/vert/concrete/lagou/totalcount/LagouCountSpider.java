@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.totalcount;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -18,10 +18,10 @@ import java.util.stream.Stream;
 @Component(value = "lagouCountSpider")
 public class LagouCountSpider extends BaseSpider {
 
-    @Autowired @Qualifier("lagouCountStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("lagouListFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("lagouCountParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("countPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("lagouCountStarter") BaseProcessor starter;
+    @Autowired @Qualifier("lagouListFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("lagouCountParser") BaseProcessor parser;
+    @Autowired @Qualifier("countPersister") BaseProcessor persister;
 
     public void start() {
 

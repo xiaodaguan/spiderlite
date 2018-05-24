@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.zhipin.list;
 
+import cn.guanxiaoda.spider.annotation.Processor;
 import cn.guanxiaoda.spider.components.vert.ICallBack;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseFetcher;
 import cn.guanxiaoda.spider.models.Task;
@@ -35,13 +36,13 @@ public class ListFetcher extends BaseFetcher {
 
 
     @Override
-    public void doProcess(Task task, ICallBack callback) {
+    public void fetch(Task task, ICallBack callBack) {
         String city = Optional.of(task.getCtx()).map(ctx -> ctx.get("city")).map(String::valueOf).map(URLEncoder::encode).orElse("");
         String keyword = Optional.of(task.getCtx()).map(ctx -> ctx.get("keyword")).map(String::valueOf).orElse("");
         Integer pageNo = Optional.of(task.getCtx()).map(ctx -> ctx.get("pageNo")).map(String::valueOf).map(Integer::parseInt).orElse(1);
 
         String url = URL_TEMPLATE.replace("{keyword}", keyword).replace("{city}", city).replace("{pageNo}", String.valueOf(pageNo));
 
-        handleRequest(task, url, headers, callback);
+        handleRequest(task, url, headers, callBack);
     }
 }

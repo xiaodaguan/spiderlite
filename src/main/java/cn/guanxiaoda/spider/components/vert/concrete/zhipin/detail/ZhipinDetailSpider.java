@@ -1,6 +1,8 @@
 package cn.guanxiaoda.spider.components.vert.concrete.zhipin.detail;
 
+import cn.guanxiaoda.spider.annotation.Processor;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
@@ -24,15 +26,16 @@ import java.util.stream.IntStream;
 @Slf4j
 public class ZhipinDetailSpider extends BaseSpider {
 
-    @Autowired @Qualifier("commonStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("zhipinDetailFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("zhipinDetailParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("commonFlipper") IProcessor<Task> flipper;
-    @Autowired @Qualifier("itemPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("commonStarter") BaseProcessor starter;
+    @Autowired @Qualifier("zhipinDetailFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("zhipinDetailParser") BaseProcessor parser;
+    @Autowired @Qualifier("commonFlipper") BaseProcessor flipper;
+    @Autowired @Qualifier("itemPersister") BaseProcessor persister;
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoClient;
 
     public void start() {
 
+        setName("zhipinDetailSpider");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);

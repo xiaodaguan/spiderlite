@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.wx;
 
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.models.Task;
@@ -18,11 +19,11 @@ import java.util.stream.Stream;
 @Component(value = "wxSpider")
 public class WxSpider extends BaseSpider {
 
-    @Autowired @Qualifier("wxStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("wxFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("wxParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("wxPersister") IProcessor<Task> persister;
-    @Autowired @Qualifier("commonFlipper") IProcessor<Task> pager;
+    @Autowired @Qualifier("wxStarter") BaseProcessor starter;
+    @Autowired @Qualifier("wxFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("wxParser") BaseProcessor parser;
+    @Autowired @Qualifier("wxPersister") BaseProcessor persister;
+    @Autowired @Qualifier("commonFlipper") BaseProcessor pager;
 
     public void start() {
 

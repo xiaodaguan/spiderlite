@@ -1,5 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
+import cn.guanxiaoda.spider.conf.FastJsonConf;
 import cn.guanxiaoda.spider.models.Task;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -25,7 +26,7 @@ public class Flipper extends BaseSyncProcessor {
                 .map(parsed -> (List<Map<String, Object>>) parsed)
                 .orElse(Lists.newArrayList());
         if (CollectionUtils.isEmpty(list)) {
-            log.info("no following pages, task={}", JSON.toJSONString(task));
+            log.info("no following pages, task={}", JSON.toJSONString(task, FastJsonConf.filter));
             task.setStage("stopped");
             return false;
         }
@@ -34,7 +35,7 @@ public class Flipper extends BaseSyncProcessor {
         Integer curPage = Optional.ofNullable(task.getCtx().get("pageNo")).map(Integer.class::cast).orElse(1);
         if (curPage >= maxPage) {
             task.setStage("stopped");
-            log.info("reach max pages, will stop, task={}", JSON.toJSONString(task));
+            log.info("reach max pages, will stop, task={}", JSON.toJSONString(task, FastJsonConf.filter));
             return false;
         }
         task.getCtx().put("pageNo", Optional.of(task.getCtx())
@@ -43,10 +44,9 @@ public class Flipper extends BaseSyncProcessor {
                 .map(pageNo -> pageNo + 1)
                 .get()
         );
-        task.getCtx().remove("fetched");
-        task.getCtx().remove("parsed");
-        log.info("will crawl following pages, task={}", JSON.toJSONString(task));
+        log.info("will crawl following pages, task={}", JSON.toJSONString(task, FastJsonConf.filter));
         task.setStage("paged");
+        task.setRetryNo(0);
         return true;
     }
 }

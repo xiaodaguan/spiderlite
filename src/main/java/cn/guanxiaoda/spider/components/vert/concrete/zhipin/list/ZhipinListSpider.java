@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.zhipin.list;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
@@ -23,26 +23,27 @@ import java.util.stream.IntStream;
 @Slf4j
 public class ZhipinListSpider extends BaseSpider {
 
-    @Autowired @Qualifier("commonStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("zhipinListFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("zhipinListParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("commonFlipper") IProcessor<Task> flipper;
-    @Autowired @Qualifier("itemPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("commonStarter") BaseProcessor starter;
+    @Autowired @Qualifier("zhipinListFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("zhipinListParser") BaseProcessor parser;
+    @Autowired @Qualifier("commonFlipper") BaseProcessor flipper;
+    @Autowired @Qualifier("itemPersister") BaseProcessor persister;
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoClient;
 
     public void start() {
 
+        setName("zhipin_list");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
-        addProcessor(parser, flipper, persister);
+        addProcessor(parser, persister, flipper);
         addProcessor(flipper, fetcher);
         setTerminate(persister);
 
 
         List<String> cities = Arrays.asList(
-//                "101010100",
-                "101020100"
+                "101010100"
+//                "101020100",
 //                "101280100",
 //                "101280600",
 //                "101210100"

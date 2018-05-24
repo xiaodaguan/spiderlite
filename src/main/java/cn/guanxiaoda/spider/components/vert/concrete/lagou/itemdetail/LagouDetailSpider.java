@@ -1,6 +1,6 @@
 package cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail;
 
-import cn.guanxiaoda.spider.components.vert.IProcessor;
+import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.models.Task;
 import com.google.common.collect.ImmutableMap;
@@ -20,10 +20,10 @@ import java.util.Objects;
 @Slf4j
 public class LagouDetailSpider extends BaseSpider {
 
-    @Autowired @Qualifier("lagouDetailStarter") IProcessor<Task> starter;
-    @Autowired @Qualifier("lagouDetailFetcher") IProcessor<Task> fetcher;
-    @Autowired @Qualifier("lagouDetailParser") IProcessor<Task> parser;
-    @Autowired @Qualifier("itemPersister") IProcessor<Task> persister;
+    @Autowired @Qualifier("lagouDetailStarter") BaseProcessor starter;
+    @Autowired @Qualifier("lagouDetailFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("lagouDetailParser") BaseProcessor parser;
+    @Autowired @Qualifier("itemPersister") BaseProcessor persister;
 
     public void start() {
 

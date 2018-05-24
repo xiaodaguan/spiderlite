@@ -17,4 +17,6 @@ public class Task {
     private String name;
     private String stage;
     private Map<String, Object> ctx;
+    private int retryNo;
+    private int maxRetry;
 }

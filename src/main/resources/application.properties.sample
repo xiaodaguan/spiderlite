@@ -3,5 +3,6 @@ custom.mongodb.port=27017
 custom.mongodb.db=spider_db
 custom.mongodb.user=spider
 custom.mongodb.pass=123456
+fetch.ratelimit={"lagou.com":2, "ke.com":0.1, "zhipin.com":4}
 
 proxy.vendor.url=http://dynamic.goubanjia.com/dynamic/get/{yourCode}.html?sep=3

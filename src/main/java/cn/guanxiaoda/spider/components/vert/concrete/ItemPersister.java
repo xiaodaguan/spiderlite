@@ -1,7 +1,10 @@
 package cn.guanxiaoda.spider.components.vert.concrete;
 
+import cn.guanxiaoda.spider.conf.FastJsonConf;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
 import cn.guanxiaoda.spider.models.Task;
+import com.alibaba.fastjson.JSON;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,8 +40,11 @@ public class ItemPersister extends BaseSyncProcessor {
             mongoDbClient.save(collection, (Map) parsed);
             task.setStage("persisted");
         } else {
-            log.error("illegal parse result type, parsed={}", parsed);
+            log.error("illegal result type, parsed={}, task={}", parsed, JSON.toJSONString(task));
+            retry(task);
         }
         return true;
     }
+
+
 }
