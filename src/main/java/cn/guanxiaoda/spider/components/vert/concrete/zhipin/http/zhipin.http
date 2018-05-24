@@ -16,7 +16,7 @@ x-requested-with: XMLHttpRequest
 GET https://m.zhipin.com/job_detail/dab04586c94d47051XR-29-0FVI~.html
 accept: */*
 accept-language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
-referer: https://m.zhipin.com/job_detail/?query=java&scity=101010100&industry=&position=
+#referer: https://m.zhipin.com/job_detail/?query=java&scity=101010100&industry=&position=
 user-agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3426.2 Mobile Safari/537.36
 x-requested-with: XMLHttpRequest
 

@@ -42,11 +42,11 @@ public class Parser extends BaseSyncProcessor {
                                 )
                                 .map(item -> {
                                     item.put("crawlTime", LocalDateTime.now().format(dtf));
-                                    item.put("uniqueKey", String.valueOf(task.getCtx().get("city")));
                                     item.put("city", String.valueOf(task.getCtx().get("city")));
                                     item.put("href", String.valueOf(task.getCtx().get("href")));
                                     item.put("title", String.valueOf(task.getCtx().get("title")));
                                     item.put("salary", String.valueOf(task.getCtx().get("salary")));
+                                    item.put("uniqueKey", String.valueOf(task.getCtx().get("href")));
                                     item.put("companyName", String.valueOf(task.getCtx().get("companyName")));
                                     return item;
                                 }).orElse(Maps.newHashMap())

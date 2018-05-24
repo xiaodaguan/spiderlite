@@ -42,11 +42,11 @@ public class ZhipinListSpider extends BaseSpider {
 
 
         List<String> cities = Arrays.asList(
-                "101010100"
-//                "101020100",
-//                "101280100",
-//                "101280600",
-//                "101210100"
+                "101010100",
+                "101020100",
+                "101280100",
+                "101280600",
+                "101210100"
         );
         cities.stream()
                 .map(city -> Maps.immutableEntry(

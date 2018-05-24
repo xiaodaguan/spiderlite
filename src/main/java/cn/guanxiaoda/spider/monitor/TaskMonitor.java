@@ -125,8 +125,7 @@ public class TaskMonitor {
             crawlTimes = crawlTimes.parallelStream().filter(time -> time >= System.currentTimeMillis() - 1000 * 60).collect(Collectors.toList());
         }
 //        save();
-        log.info("task stats: {}", JSON.toJSONString(detailCount));
-        log.info("real time crawling speed: {}/min", crawlTimes.size());
+        log.info("[CRAWLING SPEED]: {}/min... [TASK STATS]: {}", crawlTimes.size(), JSON.toJSONString(detailCount));
     }
 
     private void save() {

@@ -4,14 +4,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -24,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -32,12 +32,19 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public abstract class BaseProxyManager implements IProxyManager {
+    private static final int PROXY_FAIL_MAX = 2;
+    private static final int PROXY_POOL_SIZE = 6;
+    private static final int REFRESH_INTERVAL = 1500;
     private static List<String> proxyContainer;
-    private static CloseableHttpClient client = HttpClientBuilder.create().build();
+    private static OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(3000, TimeUnit.MILLISECONDS)
+            .readTimeout(3000, TimeUnit.MILLISECONDS)
+            .writeTimeout(3000, TimeUnit.MILLISECONDS)
+            .build();
     private static RateLimiter rl = RateLimiter.create(1);
     @Value("${proxy.vendor.url}")
     public String url;
-    Map<String, Integer> proxyFailTimeMap = new ConcurrentHashMap<>();
+    private Map<String, Integer> proxyFailTimeMap = new ConcurrentHashMap<>();
 
     @Override
     public HttpHost randomGetOneHttpHost() {
@@ -65,39 +72,37 @@ public abstract class BaseProxyManager implements IProxyManager {
                 .orElse(null);
     }
 
-    @Scheduled(fixedRate = 1500)
+    @Scheduled(fixedRate = REFRESH_INTERVAL)
     public void refresh() {
         if (proxyContainer == null) {
             proxyContainer = Lists.newArrayList();
         }
 
-        HttpGet get = new HttpGet(url);
-        String content = null;
-        try {
-            rl.acquire();
-            CloseableHttpResponse response = client.execute(get);
-            if (200 != response.getStatusLine().getStatusCode()) {
-                log.warn("didn't get proxy");
-                return;
-            }
-            content = Optional.of(response)
-                    .map(HttpResponse::getEntity)
-                    .map(entity -> {
-                        try {
-                            return EntityUtils.toString(entity);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return null;
-                        }
-                    }).orElse(null);
-        } catch (Exception e) {
-            log.error("refresh proxy failure.", e);
-        }
-        proxyContainer.addAll(getIpPortList(content));
+        rl.acquire();
+        client.newCall(new Request.Builder().get().url(url).build())
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        log.error("fetch proxy failure, msg={}", e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        Optional.of(response)
+                                .map(Response::body)
+                                .ifPresent(responseBody -> {
+                                    try {
+                                        proxyContainer.addAll(getIpPortList(responseBody.string()));
+                                    } catch (IOException e) {
+                                        log.error("get response body string failure, msg={}", e.getMessage());
+                                    }
+                                });
+                    }
+                });
 
 
         synchronized (this) {
-            if (CollectionUtils.size(proxyContainer) > 20) {
+            if (CollectionUtils.size(proxyContainer) > PROXY_POOL_SIZE) {
                 proxyContainer = proxyContainer.stream().skip(2).collect(Collectors.toList());
             }
         }
@@ -123,7 +128,7 @@ public abstract class BaseProxyManager implements IProxyManager {
     @Override
     public synchronized void recordProxyFailure(String ipPort) {
         proxyFailTimeMap.put(ipPort, proxyFailTimeMap.getOrDefault(ipPort, 0) + 1);
-        if (proxyFailTimeMap.get(ipPort) > 2) {
+        if (proxyFailTimeMap.get(ipPort) > PROXY_FAIL_MAX) {
             removeProxy(ipPort);
         }
     }

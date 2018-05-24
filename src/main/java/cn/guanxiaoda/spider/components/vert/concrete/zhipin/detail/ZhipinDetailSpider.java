@@ -1,7 +1,5 @@
 package cn.guanxiaoda.spider.components.vert.concrete.zhipin.detail;
 
-import cn.guanxiaoda.spider.annotation.Processor;
-import cn.guanxiaoda.spider.components.vert.IProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
 import cn.guanxiaoda.spider.dao.mongodb.IMongoDbClient;
@@ -13,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 /**
  * @author guanxiaoda
@@ -35,7 +30,7 @@ public class ZhipinDetailSpider extends BaseSpider {
 
     public void start() {
 
-        setName("zhipinDetailSpider");
+        setName("zhipin_detail");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
@@ -48,10 +43,11 @@ public class ZhipinDetailSpider extends BaseSpider {
                 .map(doc -> {
                     try {
                         return Task.builder()
-                                .name("zhipin-detail")
+                                .name("zhipin_detail")
                                 .ctx(Maps.newHashMap(
                                         ImmutableMap.<String, Object>builder()
                                                 .put("collection", "zhipin_detail")
+                                                .put("keyword", "java")
                                                 .put("href", doc.getString("href"))
                                                 .put("title", doc.get("title"))
                                                 .put("salary", doc.getString("salary"))

@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,17 +34,12 @@ public class DetailFetcher extends BaseFetcher {
 
 
     @Override
-    public void doProcess(Task task, ICallBack callback) {
-        String href = Optional.of(task.getCtx()).map(ctx -> ctx.get("href")).map(String::valueOf).map(URLEncoder::encode).orElse("");
+    public void fetch(Task task, ICallBack callBack) {
+        String href = Optional.of(task.getCtx()).map(ctx -> ctx.get("href")).map(String::valueOf).orElse("");
 
         String url = URL_TEMPLATE.replace("{href}", href);
 
-        handleRequest(task, url, headers, callback);
-    }
-
-    @Override
-    public void fetch(Task task, ICallBack callBack) {
-
+        handleRequest(task, url, headers, callBack);
     }
 
 

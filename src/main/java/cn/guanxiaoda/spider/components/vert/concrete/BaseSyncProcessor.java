@@ -25,6 +25,7 @@ public abstract class BaseSyncProcessor extends BaseProcessor {
                     callback.call(task);
                 } catch (Exception e) {
                     log.error("callback failure", e);
+                    retry(task);
                 }
             } else {
                 log.error("process failure, task={}", JSON.toJSONString(task, FastJsonConf.filter));
