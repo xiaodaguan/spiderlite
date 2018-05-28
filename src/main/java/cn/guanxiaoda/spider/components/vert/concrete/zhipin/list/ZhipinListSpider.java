@@ -49,6 +49,7 @@ public class ZhipinListSpider extends BaseSpider {
                 "101210100"
         );
         cities.stream()
+                .filter("101010100"::equals)
                 .map(city -> Maps.immutableEntry(
                         city,
                         1

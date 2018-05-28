@@ -1,4 +1,4 @@
-package cn.guanxiaoda.spider.components.vert.concrete.zhipin.detail;
+package cn.guanxiaoda.spider.components.vert.concrete.zhipin.company;
 
 import cn.guanxiaoda.spider.components.vert.concrete.BaseProcessor;
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSpider;
@@ -17,19 +17,19 @@ import java.util.Objects;
  * @author guanxiaoda
  * @date 2018/4/13
  */
-@Component(value = "zhipinDetailSpider")
+@Component(value = "zhipinCompSpider")
 @Slf4j
-public class ZhipinDetailSpider extends BaseSpider {
+public class ZhipinCompSpider extends BaseSpider {
 
     @Autowired @Qualifier("commonStarter") BaseProcessor starter;
-    @Autowired @Qualifier("zhipinDetailFetcher") BaseProcessor fetcher;
-    @Autowired @Qualifier("zhipinDetailParser") BaseProcessor parser;
+    @Autowired @Qualifier("zhipinCompFetcher") BaseProcessor fetcher;
+    @Autowired @Qualifier("zhipinCompParser") BaseProcessor parser;
     @Autowired @Qualifier("itemPersister") BaseProcessor persister;
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoClient;
 
     public void start() {
 
-        setName("zhipin_detail");
+        setName("zhipin_comp");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
@@ -37,23 +37,19 @@ public class ZhipinDetailSpider extends BaseSpider {
         setTerminate(persister);
 
 
-        mongoClient.findAllDocs("zhipin_list")
+        mongoClient.findAllDocs("zhipin_detail")
                 .stream()
                 .map(doc -> {
                     try {
                         return Task.builder()
-                                .name("zhipin_detail")
+                                .name("zhipin_comp")
                                 .ctx(Maps.newHashMap(
                                         ImmutableMap.<String, Object>builder()
-                                                .put("collection", "zhipin_detail")
-                                                .put("keyword", "java")
-                                                .put("href", doc.getString("href"))
-                                                .put("title", doc.get("title"))
-                                                .put("salary", doc.getString("salary"))
-                                                .put("companyName", doc.getString("companyName"))
-                                                .put("crawlTime", doc.getString("crawlTime"))
+                                                .put("collection", "zhipin_comp")
+                                                .put("compHref", doc.getString("compHref"))
+                                                .put("coordinate", doc.get("coordinate"))
                                                 .put("city", doc.getString("city"))
-                                                .put("uniqueKey", doc.getString("uniqueKey"))
+                                                .put("companyName", doc.getString("companyName"))
                                                 .build()
                                 ))
                                 .build();

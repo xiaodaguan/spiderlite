@@ -28,7 +28,7 @@ public abstract class BaseProcessor implements IProcessor<Task> {
     }
 
     @Synchronized
-    void retry(Task task) {
+    protected void retry(Task task) {
         if (task.getRetryNo() > (task.getMaxRetry() == 0 ? 5 : task.getMaxRetry())) {
             log.error("[MAX RETRY]drop task:{}", JSON.toJSONString(task, FastJsonConf.filter));
             return;

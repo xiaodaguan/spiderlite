@@ -1,4 +1,4 @@
-package cn.guanxiaoda.spider.components.vert.concrete.zhipin.detail;
+package cn.guanxiaoda.spider.components.vert.concrete.zhipin.company;
 
 import cn.guanxiaoda.spider.components.vert.concrete.BaseSyncProcessor;
 import cn.guanxiaoda.spider.models.Task;
@@ -18,7 +18,7 @@ import static im.nll.data.extractor.Extractors.selector;
  * @author guanxiaoda
  * @date 2018/4/17
  */
-@Component(value = "zhipinDetailParser")
+@Component(value = "zhipinCompParser")
 public class Parser extends BaseSyncProcessor {
 
 
@@ -29,26 +29,23 @@ public class Parser extends BaseSyncProcessor {
         Map<String, String> result = Optional.of(task.getCtx())
                 .map(ctx -> ctx.get("fetched"))
                 .map(String::valueOf)
-//                .map(body -> body.replace("\\\"", "\""))
                 .map(body ->
                         Optional.of(body)
                                 .map(html ->
                                         Extractors.on(html)
-                                                .extract("requirement", selector("div.job-banner>p.text"))
-                                                .extract("tags", selector("div.job-banner>div.job-tags.text"))
-                                                .extract("desc", selector("div.job-detail > div.detail-content > div.job-sec > div.text.text"))
-                                                .extract("coordinate", selector("div.job-detail > div.detail-content > div.job-sec div#map-container.attr(data-long-lat)"))
-                                                .extract("compHref", selector("div.job-detail > div.detail-content > div.reqular-box.job-sec > div.view-more > a.attr(href)"))
+                                                //行业
+                                                .extract("field", selector("div.company-info > div.company-primary > p:nth-child(3) > span:first-child"))
+                                                //规模
+                                                .extract("scale", selector("div.company-info > div.company-primary > p:nth-child(3) > span:last-child"))
                                                 .asMap()
                                 )
                                 .map(item -> {
                                     item.put("crawlTime", LocalDateTime.now().format(dtf));
                                     item.put("city", String.valueOf(task.getCtx().get("city")));
-                                    item.put("href", String.valueOf(task.getCtx().get("href")));
-                                    item.put("title", String.valueOf(task.getCtx().get("title")));
-                                    item.put("salary", String.valueOf(task.getCtx().get("salary")));
-                                    item.put("uniqueKey", String.valueOf(task.getCtx().get("href")));
+                                    item.put("compHref", String.valueOf(task.getCtx().get("compHref")));
+                                    item.put("coordinate", String.valueOf(task.getCtx().get("coordinate")));
                                     item.put("companyName", String.valueOf(task.getCtx().get("companyName")));
+                                    item.put("uniqueKey", String.valueOf(task.getCtx().get("compHref")));
                                     return item;
                                 }).orElse(Maps.newHashMap())
 

@@ -46,7 +46,7 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
      */
     private static Map<String, RateLimiter> rlMap = new ConcurrentHashMap<>();
     protected @Autowired ClientPool clientPool;
-    @Autowired @Qualifier("gobanjiaProxyManager") IProxyManager proxyManager;
+    @Autowired @Qualifier("gobanjiaProxyManager") protected IProxyManager proxyManager;
     @Value("${fetch.ratelimit}") private String rlStr;
 
     @PostConstruct
@@ -65,7 +65,7 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
         );
     }
 
-    private RateLimiter getRatelimiter(String hostName) {
+    protected RateLimiter getRatelimiter(String hostName) {
         return rlMap.getOrDefault(hostName, RateLimiter.create(0.1));
     }
 
