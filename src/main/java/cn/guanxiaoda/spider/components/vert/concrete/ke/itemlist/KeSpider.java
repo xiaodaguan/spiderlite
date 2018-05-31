@@ -24,7 +24,7 @@ public class KeSpider extends BaseSpider {
     @Autowired @Qualifier("itemPersister") BaseProcessor persister;
 
     public void start() {
-
+        setName("beikezhaofang_list");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);

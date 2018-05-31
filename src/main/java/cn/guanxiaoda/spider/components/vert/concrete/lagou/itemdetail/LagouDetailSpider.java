@@ -26,7 +26,7 @@ public class LagouDetailSpider extends BaseSpider {
     @Autowired @Qualifier("itemPersister") BaseProcessor persister;
 
     public void start() {
-
+        setName("lagou_detail");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);

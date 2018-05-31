@@ -31,7 +31,7 @@ public class LagouListSpider extends BaseSpider {
     @Autowired @Qualifier("mongoClient") IMongoDbClient mongoClient;
 
     public void start() {
-
+        setName("lagou_list");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);

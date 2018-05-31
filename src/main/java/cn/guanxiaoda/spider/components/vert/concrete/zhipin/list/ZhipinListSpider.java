@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author guanxiaoda
@@ -36,8 +37,9 @@ public class ZhipinListSpider extends BaseSpider {
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
-        addProcessor(parser, persister, flipper);
-        addProcessor(flipper, fetcher);
+//        addProcessor(parser, persister, flipper);
+        addProcessor(parser, persister);
+//        addProcessor(flipper, fetcher);
         setTerminate(persister);
 
 
@@ -52,26 +54,65 @@ public class ZhipinListSpider extends BaseSpider {
                 .filter("101010100"::equals)
                 .map(city -> Maps.immutableEntry(
                         city,
+                        // max page
                         1
                 ))
                 .peek(entry -> log.info("city={}, page={}", entry.getKey(), entry.getValue()))
                 .flatMap(pair ->
                         IntStream.range(1, pair.getValue() + 1).mapToObj(
                                 pageNo ->
-                                        Task.builder()
+
+                                        Stream.of(
+                                                /*bat*/
+                                                "百度",
+                                                "阿里巴巴",
+                                                "腾讯",
+                                                "爱奇艺",
+                                                "支付宝",
+                                                "蚂蚁金服",
+                                                /*tmdj*/
+                                                "京东",
+                                                "今日头条",
+                                                "美团",
+                                                "滴滴",
+                                                "网易",
+                                                "华为",
+                                                "小米",
+                                                "360",
+                                                "搜狗",
+                                                "微博",
+                                                "新浪",
+                                                "58同城",
+                                                "携程",
+                                                "去哪儿",
+                                                "乐视",
+                                                "饿了么",
+                                                "京东金融",
+                                                "优酷",
+                                                "知乎",
+                                                "链家",
+                                                "快手",
+                                                "陌陌",
+                                                /*外企*/
+                                                "微软",
+                                                "谷歌",
+                                                "Amazon",
+                                                "亚马逊"
+                                        ).map(kw -> Task.builder()
                                                 .name("zhipin_list")
                                                 .ctx(
                                                         Maps.newHashMap(
                                                                 ImmutableMap.<String, Object>builder()
                                                                         .put("city", pair.getKey())
-                                                                        .put("keyword", "java")
+                                                                        .put("keyword", kw)
                                                                         .put("pageNo", pageNo)
                                                                         .put("collection", "zhipin_list")
                                                                         .build()
                                                         )
-                                                ).build()
+                                                ).build())
 
-                        )
+
+                        ).flatMap(stream -> stream)
 
                 )
                 .forEach(this::launch);

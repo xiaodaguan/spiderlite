@@ -59,7 +59,7 @@ public class MongoClient implements IMongoDbClient {
     public void save(String collection, Map<String, Object> item) {
         genUniqueIdIfNotExist(item);
         try {
-            Document doc = findDocById(collection, item);
+            Document doc = findDocByItem(collection, item);
             if (doc == null) {
                 client.getDatabase(db).getCollection(collection).insertOne(new Document(item));
                 log.info("item saved: {} <- {}", collection, item);
@@ -77,13 +77,18 @@ public class MongoClient implements IMongoDbClient {
     }
 
     @Override
-    public Document findDocById(String collection, Map<String, Object> item) {
+    public Document findDocByItem(String collection, Map<String, Object> item) {
         genUniqueIdIfNotExist(item);
         try {
             return client.getDatabase(db).getCollection(collection).find(eq("_id", item.get("_id"))).first();
         } catch (Exception e) {
             log.error("find doc failure: msg={}, coll={}, doc={}", e.getMessage(), collection, item);
         }
+        return null;
+    }
+
+    @Override
+    public Document findDocByField(String collection, String field, Object value) {
         return null;
     }
 

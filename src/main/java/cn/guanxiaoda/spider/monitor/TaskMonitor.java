@@ -92,7 +92,7 @@ public class TaskMonitor {
 
     private void load() {
         totalCount = Maps.newConcurrentMap();
-        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
+        Optional.ofNullable(mongoDbClient.findDocByItem(MONITOR_COLLECTION, Maps.newHashMap(
                 ImmutableMap.<String, Object>builder()
                         .put("_id", TOTAL_ID)
                         .build())))
@@ -102,7 +102,7 @@ public class TaskMonitor {
                         .forEach((k, v) -> totalCount.put((String) k, new AtomicInteger((Integer) v))));
 
         detailCount = Maps.newConcurrentMap();
-        Optional.ofNullable(mongoDbClient.findDocById(MONITOR_COLLECTION, Maps.newHashMap(
+        Optional.ofNullable(mongoDbClient.findDocByItem(MONITOR_COLLECTION, Maps.newHashMap(
                 ImmutableMap.<String, Object>builder()
                         .put("_id", DETAIL_ID)
                         .build())))

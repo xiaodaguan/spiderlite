@@ -24,7 +24,7 @@ public class KeCountSpider extends BaseSpider {
     @Autowired @Qualifier("countPersister") BaseProcessor persister;
 
     public void start() {
-
+        setName("beikezhaofang_count");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
@@ -46,7 +46,7 @@ public class KeCountSpider extends BaseSpider {
                                 Maps.newHashMap(ImmutableMap.<String, Object>builder()
                                         .put("cityId", cityId)
                                         .build())
-                        ).name("wx_papers").build()
+                        ).name("beikezhaofang_count").build()
         ).forEach(this::launch);
     }
 

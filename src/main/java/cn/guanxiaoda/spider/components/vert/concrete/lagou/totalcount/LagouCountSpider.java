@@ -24,7 +24,7 @@ public class LagouCountSpider extends BaseSpider {
     @Autowired @Qualifier("countPersister") BaseProcessor persister;
 
     public void start() {
-
+        setName("lagou_count");
         setStarter(starter);
         addProcessor(starter, fetcher);
         addProcessor(fetcher, parser);
