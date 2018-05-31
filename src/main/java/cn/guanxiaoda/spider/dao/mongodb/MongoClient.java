@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.regex;
 
 /**
  * @author guanxiaoda
@@ -77,6 +78,12 @@ public class MongoClient implements IMongoDbClient {
     }
 
     @Override
+    public List<String> findAllCollectionNames() {
+        return StreamSupport.stream(client.getDatabase(db).listCollectionNames().spliterator(), true)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Document findDocByItem(String collection, Map<String, Object> item) {
         genUniqueIdIfNotExist(item);
         try {
@@ -88,8 +95,11 @@ public class MongoClient implements IMongoDbClient {
     }
 
     @Override
-    public Document findDocByField(String collection, String field, Object value) {
-        return null;
+    public List<Document> findDocByFieldLike(String collection, String field, Object value) {
+        return StreamSupport.stream(client.getDatabase(db).getCollection(collection)
+                        .find(regex(field, ".*" + value + ".*")).spliterator(),
+                true)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -117,7 +127,7 @@ public class MongoClient implements IMongoDbClient {
         } else {
             if (item.containsKey("uniqueKey")) {
                 item.put("_id", Hashing.sha256().hashString(String.valueOf(item.get("uniqueKey")), Charset.defaultCharset()).toString());
-            }else if (item.containsKey("name")) {
+            } else if (item.containsKey("name")) {
                 item.put("_id", Hashing.sha256().hashString(String.valueOf(item.get("name")), Charset.defaultCharset()).toString());
             } else if (item.containsKey("title")) {
                 item.put("_id", Hashing.sha256().hashString(String.valueOf(item.get("title")), Charset.defaultCharset()).toString());

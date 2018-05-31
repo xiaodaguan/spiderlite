@@ -18,12 +18,14 @@ public interface IMongoDbClient {
 
     void save(String collection, List<Map<String, Object>> items);
 
+    List<String> findAllCollectionNames();
+
     /**
      * read
      */
     Document findDocByItem(String collection, Map<String, Object> item);
 
-    Document findDocByField(String collection, String field, Object value);
+    List<Document> findDocByFieldLike(String collection, String field, Object value);
 
     List<Document> findAllDocs(String collection);
 
