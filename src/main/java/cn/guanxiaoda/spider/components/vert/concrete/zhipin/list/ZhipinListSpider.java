@@ -70,7 +70,7 @@ public class ZhipinListSpider extends BaseSpider {
                                                 "爱奇艺",
                                                 "支付宝",
                                                 "蚂蚁金服",
-                                                /*tmdj*/
+                                                /*tmdnj 等*/
                                                 "京东",
                                                 "今日头条",
                                                 "美团",
@@ -89,6 +89,7 @@ public class ZhipinListSpider extends BaseSpider {
                                                 "饿了么",
                                                 "京东金融",
                                                 "优酷",
+                                                "爱奇艺",
                                                 "知乎",
                                                 "链家",
                                                 "快手",

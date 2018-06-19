@@ -1,5 +1,7 @@
 package cn.guanxiaoda.spider.controllers;
 
+import cn.guanxiaoda.spider.components.vert.concrete.douban.commentlist.DoubanCommentListSpider;
+import cn.guanxiaoda.spider.components.vert.concrete.douban.movielist.DoubanMovieListSpider;
 import cn.guanxiaoda.spider.components.vert.concrete.ke.itemlist.KeSpider;
 import cn.guanxiaoda.spider.components.vert.concrete.ke.taotalcount.KeCountSpider;
 import cn.guanxiaoda.spider.components.vert.concrete.lagou.itemdetail.LagouDetailSpider;
@@ -36,6 +38,9 @@ public class SpiderController {
     @Autowired @Qualifier("zhipinDetailSpider") ZhipinDetailSpider zhipinDetailSpider;
     @Autowired @Qualifier("zhipinCompSpider") ZhipinCompSpider zhipinCompSpider;
 
+    @Autowired @Qualifier("doubanCommentListSpider") DoubanCommentListSpider doubanDoubanCommentListSpider;
+    @Autowired @Qualifier("doubanMovieListSpider") DoubanMovieListSpider doubanMovieListSpider;
+
     @GetMapping("/wx/start")
     public void wxStart() { wxSpider.start(); }
 
@@ -65,5 +70,13 @@ public class SpiderController {
 
     @GetMapping("zhipin/comp/start")
     public void zhipinCompStart() { zhipinCompSpider.start();}
+
+
+    @GetMapping("douban/comment/list/start")
+    public void doubanCommentListStart() { doubanDoubanCommentListSpider.start();}
+
+    @GetMapping("douban/movie/list/start")
+    public void doubanMovieListStart() { doubanMovieListSpider.start();}
+
 
 }

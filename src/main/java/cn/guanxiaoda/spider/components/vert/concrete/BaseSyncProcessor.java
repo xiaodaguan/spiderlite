@@ -29,6 +29,7 @@ public abstract class BaseSyncProcessor extends BaseProcessor {
                 }
             } else {
                 log.error("process failure, task={}", JSON.toJSONString(task, FastJsonConf.filter));
+                retry(task);
             }
         } catch (Exception e) {
             log.error("async processor process failure task={}", JSON.toJSONString(task, FastJsonConf.filter));

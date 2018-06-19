@@ -21,6 +21,7 @@ public abstract class BaseAsyncProcessor extends BaseProcessor {
             doProcess(task, callback);
         } catch (Exception e) {
             log.error("async processor process failure task={}", JSON.toJSONString(task, FastJsonConf.filter));
+            retry(task);
         }
 
     }

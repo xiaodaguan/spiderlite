@@ -82,7 +82,7 @@ public abstract class BaseFetcher extends BaseAsyncProcessor {
             log.error("invalid url: {}", url);
             return;
         }
-        RateLimiter rl = getRatelimiter(Optional.of(httpUrl).map(HttpUrl::topPrivateDomain).orElse(""));
+        RateLimiter rl = getRatelimiter(Optional.of(httpUrl).map(HttpUrl::topPrivateDomain).orElse("default.rate.limiter"));
         rl.acquire();
         OkHttpClient client = clientPool.getOkClient();
         client.newCall(new Request.Builder()

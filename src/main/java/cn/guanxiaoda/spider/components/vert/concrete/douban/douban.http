@@ -1,0 +1,70 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+GET https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=&start=400
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Host: movie.douban.com
+Referer: https://movie.douban.com/tag/
+User-Agent: Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36
+
+###
+GET https://m.douban.com/rexxar/api/v2/movie/27133303/interests?count=25&order_by=hot&start=400&ck=&for_mobile=1
+Accept: application/json
+Referer: https://m.douban.com/movie/subject/27133303/comments?sort=new_score&start=25
+User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3443.0 Mobile Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+###
+GET https://m.douban.com/rexxar/api/v2/movie/27133303/interests?count=25&order_by=hot&start=900&ck=&for_mobile=1
+Accept: application/json
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Cookie: talionnav_show_app="0"; bid=LaOGqh6vJjc; _ga=GA1.3.958655748.1528162145; _gid=GA1.3.108454648.1528162145; Hm_lvt_6d4a8cfea88fa457c3127e14fb5fabc2=1528162147; ll="118237"; FTAPI_AT=FUCKIE; FTAPI_BLOCK_SLOT=FUCKIE; FTAPI_ST=FUCKIE; FTAPI_Source=m.douban.com/movie/; _gat_UA-53594431-4=1; _gat_UA-53594431-6=1; Hm_lpvt_6d4a8cfea88fa457c3127e14fb5fabc2=1528162768; FTAPI_PVC=1029201-4-ji1hsxfh
+Host: m.douban.com
+Referer: https://m.douban.com/movie/subject/24773958/comments?from=subject
+User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3446.0 Mobile Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+###
+GET https://movie.douban.com/subject/26416062/comments?status=F
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Cache-Control: max-age=0
+Connection: keep-alive
+Host: movie.douban.com
+Referer: https://movie.douban.com/subject/26416062/?from=showing
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3446.0 Mobile Safari/537.36
+
+###
+GET https://movie.douban.com/subject/26416062/comments?start=400&limit=20&sort=new_score&status=F&comments_only=1
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Host: movie.douban.com
+Referer: https://movie.douban.com/subject/26416062/comments?start=400&limit=20&sort=new_score&status=F
+User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3446.0 Mobile Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+###
+GET https://movie.douban.com/subject/26416062/comments?start=360&limit=20&sort=new_score&status=P&comments_only=1
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7
+Connection: keep-alive
+Cookie: bid=LaOGqh6vJjc; ll="118237"; __utmc=30149280; __utmz=30149280.1528286782.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmc=223695111; loc-last-index-location-id="118237"; ps=y; __utma=30149280.1062492968.1528286782.1528286782.1528939370.2; __utmt=1; __utmb=30149280.1.10.1528939370; dbcl2="131804485:6qQpRnD0n4I"; ck=6_KZ; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1528939401%2C%22https%3A%2F%2Fwww.douban.com%2Faccounts%2Flogin%3Fredir%3Dhttps%3A%2F%2Fmovie.douban.com%2F%26source%3DNone%26login_type%3Dsms%22%5D; _pk_ses.100001.4cf6=*; __utma=223695111.608796147.1528286782.1528286782.1528939401.2; __utmb=223695111.0.10.1528939401; __utmz=223695111.1528939401.2.2.utmcsr=douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/accounts/login; __yadk_uid=3V7zSc368EInBnZZtEjAkwTHa5pH5BcD; push_noty_num=0; push_doumail_num=0; _vwo_uuid_v2=DC54F3D83857815BA803C18506FD63B67|a9451b33e4e8497f9ec6a4225b3c07a1; _pk_id.100001.4cf6=47ce84638d7e02fd.1528286782.2.1528939649.1528286782.
+Host: movie.douban.com
+Referer: https://movie.douban.com/subject/26416062/comments?start=360&limit=20&sort=new_score&status=P
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3446.0 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+###
