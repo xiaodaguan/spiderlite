@@ -6,3 +6,6 @@ spiderlite.iml
 **/resources/application.properties
 **/logs/
 dist/
+
+**/data
+venv/

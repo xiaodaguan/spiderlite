@@ -20,16 +20,26 @@ def get_data_from_mongodb(limit=None):
     commColl = db['doubanComment_list']
     # document = commColl.find_one()
     # print(json.dumps(document, ensure_ascii=False))
-    if not limit:
-        docs = commColl.find()
+    docs = commColl.find()
+    if limit:
+        limit_docs_pos = []
+        limit_docs_neg = []
+        for doc in docs:
+            if int(doc['score']) <= 2 and len(limit_docs_neg) < limit:
+                limit_docs_neg.append(doc)
+            elif int(doc['score']) >= 4 and len(limit_docs_pos) < limit:
+                limit_docs_pos.append(doc)
+            if len(limit_docs_pos) >= limit and len(limit_docs_neg) >= limit:
+                break
+        limit_docs_pos.extend(limit_docs_neg)
+        return limit_docs_pos
     else:
-        docs = commColl.find().limit(limit)
-    return docs
+        return docs
 
 
 def get_stopwords():
     stopwords = []
-    with open('stopwords.txt', mode='r', encoding='utf-8') as f:
+    with open('data/stopwords.txt', mode='r', encoding='utf-8') as f:
         for line in f.readlines():
             stopwords.append(line.strip())
     print(stopwords)
@@ -63,11 +73,11 @@ def get_sents(docs):
     all_sents = []
     pos_sents = []
     neg_sents = []
-    with open('pos.txt', mode='r', encoding='utf-8') as fPos:
+    with open('data/pos.txt', mode='r', encoding='utf-8') as fPos:
         for line in fPos.readlines():
             all_sents.append(line)
             pos_sents.append(line)
-    with open('neg.txt', mode='r', encoding='utf-8') as fNeg:
+    with open('data/neg.txt', mode='r', encoding='utf-8') as fNeg:
         for line in fNeg.readlines():
             all_sents.append(line)
             neg_sents.append(line)
@@ -81,7 +91,7 @@ def get_lexicon(all_sents, stopwords):
     word_count = {}
     word_set = set()
     for idx, sent in enumerate(all_sents):
-        if idx % 100 == 0:
+        if idx % 1000 == 0:
             print('reading sent: ', idx)
         for word in jieba.cut(sent):
             if word in stopwords:
@@ -128,7 +138,7 @@ def get_dataset(pos_sents, neg_sents):
     for idx, sent in enumerate(neg_sents):
         if idx % 1000 == 0:
             print('creating dataset: ', idx)
-        one_sample = [word_to_vector(lexicon, sent), [1, 0]]
+        one_sample = [word_to_vector(lexicon, sent), [0, 1]]
         ds.append(one_sample)
 
     print("samples: ", ds)
@@ -164,18 +174,16 @@ def neural_network(_lex, data):
     return layer_output
 
 
-def train_neural_network(_lex, ds):
+def train_neural_network(_lex, ds, epochs, batch_size):
     _dataset = np.array(ds)
 
     x = tf.placeholder('float', [None, len(_dataset[0][0])])
     y = tf.placeholder('float')
 
-    batch_size = 50
     predict = neural_network(_lex, x)
     cost_func = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=predict, labels=y))
     optimizer = tf.train.AdamOptimizer().minimize(cost_func)
 
-    epochs = 10
     with tf.Session() as session:
         saver = tf.train.Saver()
         session.run(tf.global_variables_initializer())
@@ -185,6 +193,9 @@ def train_neural_network(_lex, ds):
             i = 0
             epochs_loss = 0
             while i < len(train_x):
+                if i % 128 == 0 or i % 100 == 0:
+                    print('batch: ', i)
+                run_metadata = tf.RunMetadata()
                 start = i
                 end = i + batch_size
                 batch_x = train_x[start:end]
@@ -192,14 +203,20 @@ def train_neural_network(_lex, ds):
                 _, c = session.run([optimizer, cost_func], feed_dict={x: list(batch_x), y: list(batch_y)})
                 epochs_loss += c
                 i += batch_size
-            print(epoch, ' : ', epochs_loss)
-        text_x = _dataset[:, 0]
-        text_y = _dataset[:, 1]
-        correct = tf.equal(tf.argmax(predict, 1), tf.argmax(y, 1))
-        accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-        print('准确率: ', accuracy.eval({x: list(text_x), y: list(text_y)}))
 
-        saver.save(session, './model.ckpt')
+            print(epoch, ' : ', epochs_loss)
+
+            text_x = _dataset[:, 0]
+            text_y = _dataset[:, 1]
+            correct = tf.equal(tf.argmax(predict, 1), tf.argmax(y, 1))
+            accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
+
+            print('准确率: ', accuracy.eval({x: list(text_x), y: list(text_y)}))
+
+        saver.save(session, './data/model.ckpt')
+
+        writer = tf.summary.FileWriter("./data")
+        writer.add_graph(session.graph)
 
 
 # 使用模型预测, [0] good, [1] bad
@@ -226,7 +243,7 @@ def prediction(_lex, text):
 stopwords = get_stopwords()
 
 # 加载评论
-docs = get_data_from_mongodb(limit=50000)
+docs = get_data_from_mongodb(limit=10000)
 
 # 句子集
 all_sents, pos_sents, neg_sents = get_sents(docs)
@@ -238,10 +255,15 @@ lexicon = get_lexicon(all_sents, stopwords)
 ds = get_dataset(pos_sents, neg_sents)
 
 # 训练
-print('training...')
-train_neural_network(lexicon, ds)
+print('training...', np.shape(ds))
+train_neural_network(lexicon, ds, 10, 50)
 
 # 预测
 print('predicting...')
-print(prediction(lexicon, "好电影"))
-print(prediction(lexicon, "烂"))
+print(prediction(lexicon, "好电影"))  # True
+print(prediction(lexicon, "垃圾电影"))  # False
+print(prediction(lexicon, "无聊的片子"))  # False
+print(prediction(lexicon, "好评！！"))  # True
+print(prediction(lexicon, '简直烂到家了。'))  # False
+print(prediction(lexicon, '全程无尿点'))  # True
+print(prediction(lexicon, '垃圾不解释'))  # False
